@@ -895,32 +895,164 @@ function submitForm(type) {
 }
 
 // ══════════════════════════════════════
-// OCR (simulated — wire to Google Vision API)
+// ══════════════════════════════════════
+// IMAGE UTILS — EXIF rotation fix
 // ══════════════════════════════════════
 let _ocrText = '';
+let _currentScanType = '';
 
 function triggerUpload() {
   document.getElementById('fileInput').click();
 }
 
+// Read EXIF orientation tag from ArrayBuffer
+function getExifOrientation(buffer) {
+  const view = new DataView(buffer);
+  if (view.getUint16(0, false) !== 0xFFD8) return 1;
+  let offset = 2;
+  while (offset < view.byteLength) {
+    const marker = view.getUint16(offset, false);
+    offset += 2;
+    if (marker === 0xFFE1) {
+      if (view.getUint32(offset + 2, false) !== 0x45786966) return 1;
+      const little = view.getUint16(offset + 8, false) === 0x4949;
+      const ifdOffset = view.getUint32(offset + 12, little);
+      const entries = view.getUint16(offset + 8 + ifdOffset, little);
+      for (let i = 0; i < entries; i++) {
+        const tag = view.getUint16(offset + 8 + ifdOffset + 2 + i * 12, little);
+        if (tag === 0x0112) return view.getUint16(offset + 8 + ifdOffset + 2 + i * 12 + 8, little);
+      }
+    }
+    if ((marker & 0xFF00) !== 0xFF00) break;
+    offset += view.getUint16(offset, false);
+  }
+  return 1;
+}
+
+// Draw image to canvas with correct orientation, return data URL
+function fixOrientation(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const arrayBuffer = e.target.result;
+      const orientation = getExifOrientation(arrayBuffer);
+      const blob = new Blob([arrayBuffer], { type: file.type });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        let w = img.naturalWidth, h = img.naturalHeight;
+        // Swap dimensions for 90/270 rotations
+        if ([5,6,7,8].includes(orientation)) { canvas.width = h; canvas.height = w; }
+        else { canvas.width = w; canvas.height = h; }
+        // Apply transform
+        switch(orientation) {
+          case 2: ctx.transform(-1,0,0,1,w,0); break;
+          case 3: ctx.transform(-1,0,0,-1,w,h); break;
+          case 4: ctx.transform(1,0,0,-1,0,h); break;
+          case 5: ctx.transform(0,1,1,0,0,0); break;
+          case 6: ctx.transform(0,1,-1,0,h,0); break;
+          case 7: ctx.transform(0,-1,-1,0,h,w); break;
+          case 8: ctx.transform(0,-1,1,0,0,w); break;
+        }
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(url);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.src = url;
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+// ══════════════════════════════════════
+// OCR — Claude Vision API
+// ══════════════════════════════════════
 function handleScan(input, type) {
   const file = input.files[0];
   if (!file) return;
+  _currentScanType = type;
   const preview = document.getElementById('ocrPreview');
-  preview.innerHTML = `<div class="ocr-result"><span class="spinner"></span>辨識中…</div>`;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = e.target.result;
-    // Show image preview
-    preview.innerHTML = `<img src="${img}" style="width:100%;border-radius:8px;margin-bottom:8px;max-height:160px;object-fit:cover">
-      <div class="ocr-result"><div class="ocr-label">OCR 辨識結果（範例）</div>
-        若已串接 Google Vision API，這裡會自動填入辨識出的文字。<br>
-        目前可手動填寫上方欄位，或在備注貼上掃描文字。
-      </div>`;
-    // Auto-fill hint: in production, call Google Vision here and parse fields
-    _ocrText = '（圖片已上傳，正式版將自動辨識）';
-  };
-  reader.readAsDataURL(file);
+  preview.innerHTML = `<div class="ocr-result"><span class="spinner"></span> 修正方向中…</div>`;
+
+  fixOrientation(file).then(dataUrl => {
+    // Show corrected preview
+    preview.innerHTML = `
+      <img src="${dataUrl}" style="width:100%;border-radius:8px;margin-bottom:8px;max-height:220px;object-fit:contain;background:#000">
+      <div class="ocr-result"><span class="spinner"></span> AI 辨識中…</div>`;
+
+    // Strip data URL prefix to get base64
+    const base64 = dataUrl.split(',')[1];
+    const prompt = type === 'contact'
+      ? `這是一張名片圖片。請辨識並以 JSON 格式回傳以下欄位（找不到的留空字串）：
+{"name":"姓名","company":"公司名稱","title":"職稱","phone":"電話","email":"Email","note":"其他備注資訊"}
+只回傳 JSON，不要其他說明。`
+      : `這是一張 DM 或文件圖片。請辨識並摘要主要內容，以 JSON 格式回傳：
+{"name":"文件/DM名稱","company":"公司名稱","keywords":"3~6個關鍵字用逗號分隔","note":"內容摘要（繁體中文，2~4句）"}
+只回傳 JSON，不要其他說明。`;
+
+    fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64 } },
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      const text = (data.content || []).map(b => b.text || '').join('');
+      let parsed = null;
+      try {
+        const clean = text.replace(/```json|```/g, '').trim();
+        parsed = JSON.parse(clean);
+      } catch(e) {}
+
+      if (parsed) {
+        // Auto-fill form fields
+        const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
+        if (type === 'contact') {
+          set('f-name', parsed.name);
+          set('f-company', parsed.company);
+          set('f-title', parsed.title);
+          set('f-phone', parsed.phone);
+          set('f-email', parsed.email);
+          set('f-note', parsed.note);
+        } else {
+          set('f-name', parsed.name);
+          set('f-company', parsed.company);
+          set('f-keywords', parsed.keywords);
+          set('f-note', parsed.note);
+        }
+        _ocrText = text;
+        const imgEl = preview.querySelector('img');
+        preview.innerHTML = '';
+        if (imgEl) preview.appendChild(imgEl);
+        preview.innerHTML += `<div class="ocr-result" style="margin-top:8px"><div class="ocr-label">✓ 辨識完成，欄位已自動填入</div>請確認並修正上方欄位內容。</div>`;
+      } else {
+        // Show raw text if JSON parse failed
+        _ocrText = text;
+        const imgEl = preview.querySelector('img');
+        preview.innerHTML = '';
+        if (imgEl) preview.appendChild(imgEl);
+        preview.innerHTML += `<div class="ocr-result" style="margin-top:8px"><div class="ocr-label">辨識結果（請手動對照填入）</div>${text.replace(/\n/g,'<br>')}</div>`;
+      }
+    })
+    .catch(err => {
+      const imgEl = preview.querySelector('img');
+      preview.innerHTML = '';
+      if (imgEl) preview.appendChild(imgEl);
+      preview.innerHTML += `<div class="ocr-result" style="margin-top:8px;color:var(--red)">辨識失敗：${err.message}<br><small>請手動填寫欄位。</small></div>`;
+    });
+  });
 }
 
 // ══════════════════════════════════════
