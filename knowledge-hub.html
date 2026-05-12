@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>知識人脈庫</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f4f0;
+  --surface: #ffffff;
+  --surface2: #f0eeea;
+  --surface3: #e8e5df;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --text: #1a1a18;
+  --text2: #6b6860;
+  --text3: #a8a49c;
+  --accent: #2d7dd2;
+  --accent2: #1a5fa8;
+  --accent-glow: rgba(45,125,210,0.1);
+  --green: #1a7a4a;
+  --green-bg: #e6f4ed;
+  --amber: #a06010;
+  --amber-bg: #fdf0dc;
+  --red: #c0392b;
+  --red-bg: #fdecea;
+  --blue: #1a5fa8;
+  --blue-bg: #e8f0fb;
+  --pink: #9b2d6e;
+  --pink-bg: #fce8f3;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font: 'Noto Sans TC', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* ── Layout ── */
+.app { display: flex; flex-direction: column; height: 100dvh; }
+.topbar {
+  padding: 14px 16px 10px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky; top: 0; z-index: 50;
+  flex-shrink: 0;
+}
+.topbar-logo { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+.topbar-logo span { color: var(--accent); }
+.topbar-stats { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+
+.main { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 100px; }
+
+.bottomnav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  z-index: 50;
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 3px; padding: 10px 4px 8px;
+  font-size: 10px; color: var(--text3); cursor: pointer;
+  transition: color .2s; border: none; background: none;
+}
+.nav-item.active { color: var(--accent); }
+.nav-item svg { width: 22px; height: 22px; stroke-width: 1.8; }
+
+/* ── Cards ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 10px;
+  transition: border-color .2s;
+}
+.card:active { border-color: var(--border2); }
+
+.card-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+.avatar {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; flex-shrink: 0;
+  font-family: var(--mono);
+}
+.card-meta { flex: 1; min-width: 0; }
+.card-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-role { font-size: 11px; color: var(--text2); margin-top: 1px; }
+.card-date { font-size: 10px; color: var(--text3); font-family: var(--mono); }
+
+.tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.tag {
+  font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 500;
+  font-family: var(--mono);
+}
+.tag-cat { background: var(--accent-glow); color: var(--accent); }
+.tag-green { background: var(--green-bg); color: var(--green); }
+.tag-amber { background: var(--amber-bg); color: var(--amber); }
+.tag-red { background: var(--red-bg); color: var(--red); }
+.tag-blue { background: var(--blue-bg); color: var(--blue); }
+.tag-pink { background: var(--pink-bg); color: var(--pink); }
+
+.card-note {
+  font-size: 12px; color: var(--text2); margin-top: 8px;
+  padding-top: 8px; border-top: 1px solid var(--border);
+  line-height: 1.5;
+}
+
+.related-section { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+.related-label { font-size: 10px; color: var(--accent); font-family: var(--mono); letter-spacing: .05em; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+.related-item {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 8px; border-radius: 8px;
+  background: var(--surface2); margin-bottom: 4px;
+  font-size: 11px; color: var(--text2); cursor: pointer;
+  border: 1px solid var(--border);
+}
+.related-item:hover { background: var(--surface3); }
+.related-item-icon { font-size: 13px; }
+
+/* ── Search ── */
+.search-wrap { position: relative; margin-bottom: 14px; }
+.search-input {
+  width: 100%; padding: 10px 14px 10px 38px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-family: var(--font);
+  font-size: 14px; outline: none; transition: border-color .2s;
+}
+.search-input:focus { border-color: var(--accent); }
+.search-input::placeholder { color: var(--text3); }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text3); pointer-events: none; }
+
+/* ── Filter tabs ── */
+.filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; scrollbar-width: none; }
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-btn {
+  padding: 5px 12px; border-radius: 20px; font-size: 12px; white-space: nowrap;
+  border: 1px solid var(--border); background: transparent; color: var(--text2);
+  cursor: pointer; transition: all .15s; font-family: var(--font);
+}
+.filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ── Section label ── */
+.section-label {
+  font-size: 10px; color: var(--text3); font-family: var(--mono);
+  letter-spacing: .08em; text-transform: uppercase;
+  margin-bottom: 10px; margin-top: 4px;
+}
+
+/* ── FAB ── */
+.fab {
+  position: fixed; bottom: 80px; right: 16px;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--accent); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(45,125,210,0.35);
+  z-index: 40; transition: transform .15s, box-shadow .15s;
+}
+.fab:active { transform: scale(0.94); box-shadow: 0 2px 8px rgba(45,125,210,0.25); }
+.fab svg { width: 24px; height: 24px; stroke: #fff; stroke-width: 2.2; }
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  z-index: 100; display: flex; align-items: flex-end;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius) var(--radius) 0 0;
+  width: 100%; max-height: 92dvh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform .3s cubic-bezier(.32,.72,0,1);
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 10px auto 4px; }
+.modal-header { padding: 8px 16px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.modal-title { font-size: 15px; font-weight: 600; }
+.modal-body { padding: 16px; }
+.modal-close { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 22px; line-height: 1; padding: 4px; }
+
+/* ── Form ── */
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 11px; color: var(--text2); margin-bottom: 6px; display: block; font-family: var(--mono); }
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 10px 12px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text);
+  font-family: var(--font); font-size: 14px; outline: none;
+  transition: border-color .2s; appearance: none;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+.form-input::placeholder, .form-textarea::placeholder { color: var(--text3); }
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-select option { background: var(--surface2); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── Importance stars ── */
+.star-row { display: flex; gap: 6px; }
+.star-btn { background: none; border: none; cursor: pointer; font-size: 22px; color: var(--text3); transition: color .15s; line-height: 1; }
+.star-btn.active { color: var(--amber); }
+
+/* ── Camera / Upload ── */
+.upload-zone {
+  border: 1.5px dashed var(--border2); border-radius: var(--radius);
+  padding: 24px 16px; text-align: center; cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.upload-zone:hover { border-color: var(--accent); background: var(--accent-glow); }
+.upload-zone-icon { font-size: 32px; margin-bottom: 8px; }
+.upload-zone-text { font-size: 13px; color: var(--text2); }
+.upload-zone-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+input[type=file] { display: none; }
+
+/* ── OCR result ── */
+.ocr-result {
+  background: var(--blue-bg); border-radius: var(--radius-sm);
+  padding: 12px; margin-top: 12px; font-size: 12px;
+  color: var(--text2); line-height: 1.7; font-family: var(--mono);
+  border-left: 3px solid var(--accent);
+}
+.ocr-label { font-size: 10px; color: var(--accent); margin-bottom: 4px; font-family: var(--mono); letter-spacing:.05em; }
+
+/* ── Buttons ── */
+.btn-primary {
+  width: 100%; padding: 13px; border-radius: var(--radius-sm);
+  background: var(--accent); border: none; color: #fff;
+  font-size: 15px; font-weight: 500; cursor: pointer;
+  font-family: var(--font); transition: opacity .15s, transform .15s;
+}
+.btn-primary:active { opacity: .85; transform: scale(.98); }
+.btn-secondary {
+  width: 100%; padding: 11px; border-radius: var(--radius-sm);
+  background: transparent; border: 1px solid var(--border2); color: var(--text2);
+  font-size: 14px; cursor: pointer; font-family: var(--font);
+  transition: background .15s; margin-top: 8px;
+}
+.btn-secondary:hover { background: var(--surface2); }
+
+/* ── Detail modal specifics ── */
+.detail-avatar {
+  width: 60px; height: 60px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700; margin: 0 auto 12px;
+  font-family: var(--mono);
+}
+.detail-name { text-align: center; font-size: 18px; font-weight: 600; }
+.detail-role { text-align: center; font-size: 12px; color: var(--text2); margin-top: 2px; }
+.detail-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.detail-row:last-child { border-bottom: none; }
+.detail-row-icon { font-size: 16px; width: 24px; text-align: center; color: var(--text3); flex-shrink: 0; }
+.detail-row-label { font-size: 11px; color: var(--text3); width: 56px; flex-shrink: 0; }
+.detail-row-val { font-size: 13px; color: var(--text); flex: 1; }
+
+/* ── Empty state ── */
+.empty { text-align: center; padding: 60px 20px; color: var(--text3); }
+.empty-icon { font-size: 40px; margin-bottom: 12px; opacity: .5; }
+.empty-text { font-size: 13px; }
+
+/* ── Stats ── */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+.stat-num { font-size: 26px; font-weight: 700; font-family: var(--mono); color: var(--text); }
+.stat-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+/* ── Loading ── */
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.2); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Type icon map ── */
+.type-contact { background: var(--blue-bg); color: var(--blue); }
+.type-dm { background: var(--pink-bg); color: var(--pink); }
+.type-note { background: var(--green-bg); color: var(--green); }
+
+/* ── Importance indicator ── */
+.imp-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; }
+.imp-1 { background: var(--text3); }
+.imp-2 { background: var(--amber); }
+.imp-3 { background: var(--green); }
+
+/* ── Toast ── */
+.toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: #1a1a18; border: none;
+  color: #fff; padding: 10px 20px; border-radius: 24px;
+  font-size: 13px; z-index: 200; opacity: 0;
+  transition: opacity .2s, transform .2s; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── Storage toggle ── */
+.storage-badge {
+  font-size: 10px; font-family: var(--mono);
+  padding: 3px 8px; border-radius: 12px;
+  background: var(--blue-bg); color: var(--blue); cursor: pointer;
+  border: 1px solid rgba(45,125,210,0.2);
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="topbar-logo">知識<span>·</span>人脈庫</div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span class="storage-badge" id="storageBadge" onclick="toggleStorageInfo()">本機模式</span>
+    <span class="topbar-stats" id="topStats">0 筆資料</span>
+  </div>
+</div>
+
+<!-- Main content -->
+<div class="main" id="mainContent"></div>
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="openAddModal()">
+  <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+</button>
+
+<!-- Bottom nav -->
+<nav class="bottomnav">
+  <button class="nav-item active" id="nav-browse" onclick="showPage('browse')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    全部
+  </button>
+  <button class="nav-item" id="nav-contacts" onclick="showPage('contacts')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    人脈
+  </button>
+  <button class="nav-item" id="nav-dm" onclick="showPage('dm')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    DM資料
+  </button>
+  <button class="nav-item" id="nav-notes" onclick="showPage('notes')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    知識
+  </button>
+  <button class="nav-item" id="nav-search" onclick="showPage('search')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    搜尋
+  </button>
+</nav>
+</div>
+
+<!-- Add Modal -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title" id="addModalTitle">新增資料</span>
+      <button class="modal-close" onclick="closeModal('addModal')">×</button>
+    </div>
+    <div class="modal-body" id="addModalBody"></div>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">資料詳情</span>
+      <button class="modal-close" onclick="closeModal('detailModal')">×</button>
+    </div>
+    <div class="modal-body" id="detailModalBody"></div>
+  </div>
+</div>
+
+<!-- Category Manager Modal -->
+<div class="modal-overlay" id="catModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">管理分類</span>
+      <button class="modal-close" onclick="closeModal('catModal')">×</button>
+    </div>
+    <div class="modal-body" id="catModalBody"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// DATA LAYER — localStorage (swap to Supabase later)
+// ══════════════════════════════════════
+const DB_KEY = 'knowledgehub_v1';
+
+function loadDB() {
+  try { return JSON.parse(localStorage.getItem(DB_KEY)) || []; }
+  catch { return []; }
+}
+function saveDB(data) {
+  localStorage.setItem(DB_KEY, JSON.stringify(data));
+  updateStats();
+}
+function getAll() { return loadDB(); }
+function getById(id) { return loadDB().find(r => r.id === id); }
+function addRecord(rec) {
+  const db = loadDB();
+  db.unshift({ ...rec, id: Date.now().toString(), createdAt: new Date().toISOString() });
+  saveDB(db);
+}
+function updateRecord(id, updates) {
+  const db = loadDB();
+  const idx = db.findIndex(r => r.id === id);
+  if (idx !== -1) { db[idx] = { ...db[idx], ...updates }; saveDB(db); }
+}
+function deleteRecord(id) {
+  saveDB(loadDB().filter(r => r.id !== id));
+}
+
+// ══════════════════════════════════════
+// CATEGORIES & COLORS
+// ══════════════════════════════════════
+const DEFAULT_CATS = {
+  // 產品與製造
+  '原料供應商':   { color: 'tag-green',  icon: '🧪', group: '產品與製造' },
+  '代工廠／OEM': { color: 'tag-green',  icon: '🏭', group: '產品與製造' },
+  '包裝材料商':   { color: 'tag-green',  icon: '📦', group: '產品與製造' },
+  '檢驗認證機構': { color: 'tag-green',  icon: '🔬', group: '產品與製造' },
+  '研發技術':     { color: 'tag-green',  icon: '⚗️', group: '產品與製造' },
+  // 品牌與行銷
+  '品牌策略':     { color: 'tag-pink',   icon: '💎', group: '品牌與行銷' },
+  '視覺設計':     { color: 'tag-pink',   icon: '🎨', group: '品牌與行銷' },
+  'KOL／網紅':   { color: 'tag-pink',   icon: '⭐', group: '品牌與行銷' },
+  '廣告投放':     { color: 'tag-pink',   icon: '📢', group: '品牌與行銷' },
+  '行銷活動':     { color: 'tag-pink',   icon: '🎯', group: '品牌與行銷' },
+  // 通路與電商
+  '實體通路':     { color: 'tag-blue',   icon: '🏪', group: '通路與電商' },
+  '電商平台':     { color: 'tag-blue',   icon: '🛒', group: '通路與電商' },
+  '跨境通路':     { color: 'tag-blue',   icon: '✈️', group: '通路與電商' },
+  '物流倉儲':     { color: 'tag-blue',   icon: '🚚', group: '通路與電商' },
+  // 跨境與海外
+  '海外市場情報': { color: 'tag-cat',    icon: '🌏', group: '跨境與海外' },
+  '海外代理商':   { color: 'tag-cat',    icon: '🤝', group: '跨境與海外' },
+  '關稅法規':     { color: 'tag-cat',    icon: '📋', group: '跨境與海外' },
+  '海外展覽':     { color: 'tag-cat',    icon: '🏛️', group: '跨境與海外' },
+  // 法規與認證
+  '化妝品法規':   { color: 'tag-amber',  icon: '⚖️', group: '法規與認證' },
+  '安全測試':     { color: 'tag-amber',  icon: '🛡️', group: '法規與認證' },
+  '政府補助':     { color: 'tag-amber',  icon: '💰', group: '法規與認證' },
+  '標案資訊':     { color: 'tag-amber',  icon: '📑', group: '法規與認證' },
+  // 知識與研究
+  '成分技術':     { color: 'tag-green',  icon: '🔭', group: '知識與研究' },
+  '市場趨勢':     { color: 'tag-green',  icon: '📈', group: '知識與研究' },
+  '競品分析':     { color: 'tag-green',  icon: '🔍', group: '知識與研究' },
+  '展覽筆記':     { color: 'tag-green',  icon: '📝', group: '知識與研究' },
+  // 人脈
+  '供應鏈人脈':   { color: 'tag-blue',   icon: '🔗', group: '人脈' },
+  '品牌人脈':     { color: 'tag-blue',   icon: '👑', group: '人脈' },
+  '通路人脈':     { color: 'tag-blue',   icon: '🤝', group: '人脈' },
+  '政府／公協會': { color: 'tag-blue',   icon: '🏛️', group: '人脈' },
+  // 其他
+  '其他':         { color: 'tag-amber',  icon: '📌', group: '其他' },
+};
+
+const CAT_COLORS = ['tag-green','tag-pink','tag-blue','tag-cat','tag-amber','tag-red'];
+
+function loadCustomCats() {
+  try { return JSON.parse(localStorage.getItem('knowledgehub_cats')) || {}; } catch { return {}; }
+}
+function saveCustomCats(obj) { localStorage.setItem('knowledgehub_cats', JSON.stringify(obj)); }
+
+function getCAT_MAP() {
+  const custom = loadCustomCats();
+  return { ...DEFAULT_CATS, ...custom };
+}
+// Keep CAT_MAP as a live proxy getter for backward compat
+let CAT_MAP = getCAT_MAP();
+const TYPE_MAP = {
+  contact: { label: '名片', icon: '👤', cls: 'type-contact' },
+  dm:      { label: 'DM', icon: '📄', cls: 'type-dm' },
+  note:    { label: '筆記', icon: '📝', cls: 'type-note' },
+};
+const IMP_MAP = { 1: { cls: 'imp-1', label: '備用' }, 2: { cls: 'imp-2', label: '重要' }, 3: { cls: 'imp-3', label: '必用' } };
+
+function catColor(cat) { CAT_MAP = getCAT_MAP(); return (CAT_MAP[cat] || CAT_MAP['其他']).color; }
+function catIcon(cat)  { CAT_MAP = getCAT_MAP(); return (CAT_MAP[cat] || CAT_MAP['其他']).icon; }
+function initials(name) {
+  if (!name) return '?';
+  const n = name.trim();
+  if (/[\u4e00-\u9fff]/.test(n)) return n.slice(-2);
+  return n.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+}
+function avatarBg(str) {
+  const palette = ['#3b3a8f','#1a5c7a','#2d6a4f','#6b3a2a','#4a1a6b','#1a4a6b'];
+  let h = 0; for (const c of str || 'X') h = (h * 31 + c.charCodeAt(0)) & 0xffffffff;
+  return palette[Math.abs(h) % palette.length];
+}
+
+// ══════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════
+let currentPage = 'browse';
+let currentFilter = 'all';
+
+function showPage(page) {
+  currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + page);
+  if (navEl) navEl.classList.add('active');
+  const fab = document.getElementById('fab');
+  fab.style.display = (page === 'search') ? 'none' : 'flex';
+  render();
+}
+
+function updateStats() {
+  const all = getAll();
+  document.getElementById('topStats').textContent = all.length + ' 筆資料';
+}
+
+// ══════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════
+function render() {
+  const mc = document.getElementById('mainContent');
+  if (currentPage === 'browse') mc.innerHTML = renderBrowse();
+  else if (currentPage === 'contacts') mc.innerHTML = renderList('contact');
+  else if (currentPage === 'dm') mc.innerHTML = renderList('dm');
+  else if (currentPage === 'notes') mc.innerHTML = renderList('note');
+  else if (currentPage === 'search') mc.innerHTML = renderSearch();
+}
+
+function renderBrowse() {
+  const all = getAll();
+  const contacts = all.filter(r => r.type === 'contact').length;
+  const dms = all.filter(r => r.type === 'dm').length;
+  const notes = all.filter(r => r.type === 'note').length;
+
+  let html = `
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num">${contacts}</div><div class="stat-label">人脈名片</div></div>
+    <div class="stat-card"><div class="stat-num">${dms}</div><div class="stat-label">展場 DM</div></div>
+    <div class="stat-card"><div class="stat-num">${notes}</div><div class="stat-label">知識筆記</div></div>
+    <div class="stat-card"><div class="stat-num">${all.filter(r=>r.importance===3).length}</div><div class="stat-label">高重要度</div></div>
+  </div>`;
+
+  if (all.length === 0) {
+    html += `<div class="empty"><div class="empty-icon">🗂️</div><div class="empty-text">還沒有任何資料<br>點右下角 + 開始新增</div></div>`;
+    return html;
+  }
+
+  html += `<div class="section-label">最近新增</div>`;
+  html += all.slice(0, 20).map(r => renderCard(r)).join('');
+  return html;
+}
+
+function renderList(type) {
+  const filtered = getAll().filter(r => r.type === type);
+  if (filtered.length === 0) {
+    return `<div class="empty"><div class="empty-icon">${TYPE_MAP[type].icon}</div><div class="empty-text">還沒有${TYPE_MAP[type].label}資料<br>點右下角 + 新增</div></div>`;
+  }
+  const cats = [...new Set(filtered.map(r => r.category))];
+  let html = `<div class="filter-row">
+    <button class="filter-btn ${currentFilter==='all'?'active':''}" onclick="setFilter('all')">全部 (${filtered.length})</button>
+    ${cats.map(c=>`<button class="filter-btn ${currentFilter===c?'active':''}" onclick="setFilter('${c}')">${c}</button>`).join('')}
+  </div>`;
+  const show = currentFilter === 'all' ? filtered : filtered.filter(r => r.category === currentFilter);
+  html += show.map(r => renderCard(r)).join('');
+  return html;
+}
+
+function renderSearch() {
+  return `
+  <div class="search-wrap">
+    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="search-input" id="searchInput" placeholder="搜尋名字、公司、關鍵字…" oninput="doSearch(this.value)" autofocus>
+  </div>
+  <div id="searchResults"><div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">輸入關鍵字搜尋</div></div></div>`;
+}
+
+function doSearch(q) {
+  const res = document.getElementById('searchResults');
+  if (!q.trim()) { res.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">輸入關鍵字搜尋</div></div>`; return; }
+  const ql = q.toLowerCase();
+  const matches = getAll().filter(r =>
+    (r.name||'').toLowerCase().includes(ql) ||
+    (r.company||'').toLowerCase().includes(ql) ||
+    (r.title||'').toLowerCase().includes(ql) ||
+    (r.category||'').toLowerCase().includes(ql) ||
+    (r.note||'').toLowerCase().includes(ql) ||
+    (r.keywords||'').toLowerCase().includes(ql) ||
+    (r.content||'').toLowerCase().includes(ql) ||
+    (r.venue||'').toLowerCase().includes(ql)
+  );
+  if (matches.length === 0) {
+    res.innerHTML = `<div class="empty"><div class="empty-icon">😶</div><div class="empty-text">找不到「${q}」相關資料</div></div>`;
+    return;
+  }
+  res.innerHTML = `<div class="section-label">找到 ${matches.length} 筆結果</div>` + matches.map(r => renderCard(r)).join('');
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  render();
+}
+
+function renderCard(r) {
+  const imp = IMP_MAP[r.importance || 1];
+  const typeInfo = TYPE_MAP[r.type] || TYPE_MAP.note;
+  const bg = avatarBg(r.name || r.id);
+  const related = findRelated(r).slice(0, 2);
+
+  let subtitle = '';
+  if (r.type === 'contact') subtitle = [r.company, r.title].filter(Boolean).join(' · ');
+  else if (r.type === 'dm') subtitle = r.company || '';
+  else subtitle = r.keywords || '';
+
+  return `<div class="card" onclick="openDetail('${r.id}')">
+    <div class="card-header">
+      <div class="avatar ${typeInfo.cls}" style="background:${bg}">${initials(r.name || r.type)}</div>
+      <div class="card-meta">
+        <div class="card-name">${r.name || '（未命名）'}</div>
+        ${subtitle ? `<div class="card-role">${subtitle}</div>` : ''}
+        <div class="card-date"><span class="imp-dot ${imp.cls}"></span>${imp.label} · ${r.venue||''} ${formatDate(r.createdAt)}</div>
+      </div>
+      <span class="tag" style="margin-left:auto;flex-shrink:0" class="${catColor(r.category)}">${catIcon(r.category)}</span>
+    </div>
+    <div class="tags">
+      <span class="tag ${catColor(r.category)}">${r.category || '其他'}</span>
+      <span class="tag" style="background:rgba(255,255,255,0.05);color:var(--text3)">${typeInfo.label}</span>
+    </div>
+    ${r.note ? `<div class="card-note">${r.note.slice(0, 80)}${r.note.length > 80 ? '…' : ''}</div>` : ''}
+    ${related.length > 0 ? `
+    <div class="related-section">
+      <div class="related-label">✦ 相關資源</div>
+      ${related.map(rel => `<div class="related-item" onclick="event.stopPropagation();openDetail('${rel.id}')">
+        <span class="related-item-icon">${TYPE_MAP[rel.type]?.icon || '📌'}</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rel.name || '（未命名）'}</span>
+        <span style="font-size:10px;color:var(--text3)">${rel._reason}</span>
+      </div>`).join('')}
+    </div>` : ''}
+  </div>`;
+}
+
+// ══════════════════════════════════════
+// CONTEXTUAL SUGGESTIONS
+// ══════════════════════════════════════
+function findRelated(record) {
+  const all = getAll().filter(r => r.id !== record.id);
+  const scored = all.map(r => {
+    let score = 0; let reason = '';
+    // Same venue
+    if (record.venue && r.venue && record.venue === r.venue) { score += 3; reason = '同場合'; }
+    // Same company
+    if (record.company && r.company && record.company === r.company) { score += 2; if (!reason) reason = '同公司'; }
+    // Same category
+    if (record.category && r.category && record.category === r.category) { score += 1; if (!reason) reason = '同類別'; }
+    // Keyword overlap
+    const kw1 = ((record.keywords || '') + ' ' + (record.note || '') + ' ' + (record.name || '')).toLowerCase();
+    const kw2 = ((r.keywords || '') + ' ' + (r.note || '') + ' ' + (r.name || '')).toLowerCase();
+    const words1 = kw1.split(/[\s,，、]+/).filter(w => w.length > 1);
+    const words2 = kw2.split(/[\s,，、]+/).filter(w => w.length > 1);
+    const overlap = words1.filter(w => words2.includes(w));
+    if (overlap.length > 0) { score += overlap.length; if (!reason) reason = '主題相關'; }
+    return { ...r, _score: score, _reason: reason };
+  });
+  return scored.filter(r => r._score > 0).sort((a, b) => b._score - a._score);
+}
+
+// ══════════════════════════════════════
+// DETAIL VIEW
+// ══════════════════════════════════════
+function openDetail(id) {
+  const r = getById(id);
+  if (!r) return;
+  const bg = avatarBg(r.name || r.id);
+  const typeInfo = TYPE_MAP[r.type] || TYPE_MAP.note;
+  const imp = IMP_MAP[r.importance || 1];
+  const related = findRelated(r);
+
+  let fields = '';
+  if (r.type === 'contact') {
+    if (r.company) fields += detailRow('🏢', '公司', r.company);
+    if (r.title) fields += detailRow('💼', '職稱', r.title);
+    if (r.phone) fields += detailRow('📞', '電話', r.phone);
+    if (r.email) fields += detailRow('✉️', 'Email', r.email);
+    if (r.line) fields += detailRow('💬', 'LINE', r.line);
+  } else if (r.type === 'dm') {
+    if (r.company) fields += detailRow('🏢', '來源', r.company);
+    if (r.keywords) fields += detailRow('🔑', '關鍵字', r.keywords);
+  } else {
+    if (r.keywords) fields += detailRow('🔑', '關鍵字', r.keywords);
+  }
+  if (r.venue) fields += detailRow('📍', '場合', r.venue);
+  if (r.category) fields += detailRow('🗂️', '分類', r.category);
+  fields += detailRow('⭐', '重要度', imp.label);
+  fields += detailRow('📅', '新增時間', formatDateFull(r.createdAt));
+
+  let relatedHtml = '';
+  if (related.length > 0) {
+    relatedHtml = `<div class="section-label" style="margin-top:20px">✦ 情境聯想 (${related.length} 筆)</div>
+    ${related.slice(0, 5).map(rel => `<div class="card" onclick="openDetail('${rel.id}')" style="margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="avatar ${TYPE_MAP[rel.type]?.cls}" style="width:32px;height:32px;border-radius:8px;font-size:11px;background:${avatarBg(rel.name||rel.id)}">${initials(rel.name||rel.type)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rel.name || '（未命名）'}</div>
+          <div style="font-size:11px;color:var(--text2)">${TYPE_MAP[rel.type]?.label} · ${rel._reason}</div>
+        </div>
+      </div>
+    </div>`).join('')}`;
+  }
+
+  document.getElementById('detailModalBody').innerHTML = `
+    <div style="text-align:center;margin-bottom:16px">
+      <div class="detail-avatar" style="background:${bg}">${initials(r.name || r.type)}</div>
+      <div class="detail-name">${r.name || '（未命名）'}</div>
+      <div class="detail-role">${typeInfo.label} · ${r.category || '其他'}</div>
+    </div>
+    ${fields}
+    ${r.note ? `<div style="margin-top:14px"><div class="section-label">備注 / 心得</div><div class="ocr-result" style="margin-top:6px">${r.note.replace(/\n/g,'<br>')}</div></div>` : ''}
+    ${r.ocrText ? `<div style="margin-top:14px"><div class="section-label">原始辨識文字</div><div class="ocr-result" style="margin-top:6px">${r.ocrText.replace(/\n/g,'<br>')}</div></div>` : ''}
+    ${relatedHtml}
+    <div style="display:flex;gap:8px;margin-top:20px">
+      <button class="btn-secondary" onclick="editRecord('${r.id}')" style="width:50%;margin:0">✏️ 編輯</button>
+      <button class="btn-secondary" onclick="confirmDelete('${r.id}')" style="width:50%;margin:0;color:var(--red)">🗑️ 刪除</button>
+    </div>`;
+  openModal('detailModal');
+}
+
+function detailRow(icon, label, val) {
+  return `<div class="detail-row"><div class="detail-row-icon">${icon}</div><div class="detail-row-label">${label}</div><div class="detail-row-val">${val}</div></div>`;
+}
+
+function confirmDelete(id) {
+  if (confirm('確定要刪除這筆資料？')) {
+    deleteRecord(id);
+    closeModal('detailModal');
+    render();
+    showToast('已刪除');
+  }
+}
+
+// ══════════════════════════════════════
+// ADD FORMS
+// ══════════════════════════════════════
+function openAddModal() {
+  const types = [
+    { type: 'contact', icon: '👤', label: '名片 / 聯絡人' },
+    { type: 'dm', icon: '📄', label: '展場 DM / 型錄' },
+    { type: 'note', icon: '📝', label: '知識 / 技能筆記' },
+  ];
+  document.getElementById('addModalTitle').textContent = '選擇類型';
+  document.getElementById('addModalBody').innerHTML = `
+    ${types.map(t => `<div class="card" onclick="showAddForm('${t.type}')" style="display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:10px">
+      <div style="font-size:28px">${t.icon}</div>
+      <div><div style="font-size:15px;font-weight:500">${t.label}</div></div>
+      <svg style="margin-left:auto;opacity:.4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>`).join('')}`;
+  openModal('addModal');
+}
+
+function showAddForm(type) {
+  document.getElementById('addModalTitle').textContent = '新增' + TYPE_MAP[type].label;
+  CAT_MAP = getCAT_MAP();
+  const groups = {};
+  Object.entries(CAT_MAP).forEach(([name, info]) => {
+    const g = info.group || '其他';
+    if (!groups[g]) groups[g] = [];
+    groups[g].push(name);
+  });
+  const catOptions = Object.entries(groups).map(([g, cats]) =>
+    `<optgroup label="── ${g} ──">${cats.map(c=>`<option value="${c}">${CAT_MAP[c].icon} ${c}</option>`).join('')}</optgroup>`
+  ).join('');
+  const impStars = [1,2,3].map(i => `<button type="button" class="star-btn" data-imp="${i}" onclick="setImp(${i})">★</button>`).join('');
+
+  let typeFields = '';
+  if (type === 'contact') {
+    typeFields = `
+      <div class="form-group">
+        <label class="form-label">掃描名片（選填）</label>
+        <div class="upload-zone" onclick="triggerUpload('${type}')">
+          <div class="upload-zone-icon">📷</div>
+          <div class="upload-zone-text">拍照或選取名片圖片</div>
+          <div class="upload-zone-sub">系統會自動辨識文字並填入</div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" capture="environment" onchange="handleScan(this,'${type}')">
+      </div>
+      <div id="ocrPreview"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">姓名 *</label><input class="form-input" id="f-name" placeholder="陳志明"></div>
+        <div class="form-group"><label class="form-label">公司</label><input class="form-input" id="f-company" placeholder="ABC 科技"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">職稱</label><input class="form-input" id="f-title" placeholder="行銷總監"></div>
+        <div class="form-group"><label class="form-label">電話</label><input class="form-input" id="f-phone" type="tel" placeholder="0912-345-678"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="f-email" type="email" placeholder="chen@abc.com"></div>
+      <div class="form-group"><label class="form-label">LINE / 其他聯絡</label><input class="form-input" id="f-line" placeholder="@chenID"></div>`;
+  } else if (type === 'dm') {
+    typeFields = `
+      <div class="form-group">
+        <label class="form-label">掃描 DM（選填）</label>
+        <div class="upload-zone" onclick="triggerUpload('${type}')">
+          <div class="upload-zone-icon">📄</div>
+          <div class="upload-zone-text">拍照或上傳 DM 圖片</div>
+          <div class="upload-zone-sub">自動辨識文字內容</div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" capture="environment" onchange="handleScan(this,'${type}')">
+      </div>
+      <div id="ocrPreview"></div>
+      <div class="form-group"><label class="form-label">標題 / 名稱 *</label><input class="form-input" id="f-name" placeholder="ABC 科技產品型錄 2024"></div>
+      <div class="form-group"><label class="form-label">來源公司</label><input class="form-input" id="f-company" placeholder="ABC 科技"></div>
+      <div class="form-group"><label class="form-label">關鍵字（逗號分隔）</label><input class="form-input" id="f-keywords" placeholder="行銷自動化, MarTech, SaaS"></div>`;
+  } else {
+    typeFields = `
+      <div class="form-group"><label class="form-label">標題 *</label><input class="form-input" id="f-name" placeholder="行銷自動化工具比較"></div>
+      <div class="form-group"><label class="form-label">關鍵字（逗號分隔）</label><input class="form-input" id="f-keywords" placeholder="MarTech, 自動化, ROI"></div>
+      <div class="form-group"><label class="form-label">內容</label><textarea class="form-textarea" id="f-content" placeholder="在這裡記錄知識內容…" style="min-height:120px"></textarea></div>`;
+  }
+
+  document.getElementById('addModalBody').innerHTML = `
+    <div class="form-group"><label class="form-label" style="display:flex;align-items:center;justify-content:space-between">分類 *<span style="font-size:10px;color:var(--accent);cursor:pointer" onclick="openCatManager()">＋ 管理分類</span></label>
+      <select class="form-select" id="f-category">${catOptions}</select>
+    </div>
+    ${typeFields}
+    <div class="form-group"><label class="form-label">認識場合 / 來源</label>
+      <input class="form-input" id="f-venue" placeholder="2024 台北國際電腦展、研討會…">
+    </div>
+    <div class="form-group"><label class="form-label">重要度</label>
+      <div class="star-row">${impStars}</div>
+    </div>
+    <div class="form-group"><label class="form-label">備注 / 心得</label>
+      <textarea class="form-textarea" id="f-note" placeholder="這個人的特別之處、DM 的重點、學到的東西…"></textarea>
+    </div>
+    <button class="btn-primary" onclick="submitForm('${type}')">✓ 儲存</button>`;
+
+  setImp(1);
+}
+
+let _currentImp = 1;
+function setImp(n) {
+  _currentImp = n;
+  document.querySelectorAll('.star-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.imp) <= n);
+  });
+}
+
+function gv(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+function submitForm(type) {
+  const name = gv('f-name');
+  if (!name) { showToast('請填寫名稱'); return; }
+  const rec = {
+    type,
+    name,
+    category: gv('f-category') || '其他',
+    venue: gv('f-venue'),
+    note: gv('f-note'),
+    importance: _currentImp,
+    ocrText: _ocrText || '',
+  };
+  if (type === 'contact') {
+    rec.company = gv('f-company');
+    rec.title = gv('f-title');
+    rec.phone = gv('f-phone');
+    rec.email = gv('f-email');
+    rec.line = gv('f-line');
+  } else if (type === 'dm') {
+    rec.company = gv('f-company');
+    rec.keywords = gv('f-keywords');
+  } else {
+    rec.keywords = gv('f-keywords');
+    rec.content = gv('f-content');
+  }
+  addRecord(rec);
+  _ocrText = '';
+  closeModal('addModal');
+  render();
+  showToast('✓ 已儲存');
+}
+
+// ══════════════════════════════════════
+// OCR (simulated — wire to Google Vision API)
+// ══════════════════════════════════════
+let _ocrText = '';
+
+function triggerUpload() {
+  document.getElementById('fileInput').click();
+}
+
+function handleScan(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  const preview = document.getElementById('ocrPreview');
+  preview.innerHTML = `<div class="ocr-result"><span class="spinner"></span>辨識中…</div>`;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = e.target.result;
+    // Show image preview
+    preview.innerHTML = `<img src="${img}" style="width:100%;border-radius:8px;margin-bottom:8px;max-height:160px;object-fit:cover">
+      <div class="ocr-result"><div class="ocr-label">OCR 辨識結果（範例）</div>
+        若已串接 Google Vision API，這裡會自動填入辨識出的文字。<br>
+        目前可手動填寫上方欄位，或在備注貼上掃描文字。
+      </div>`;
+    // Auto-fill hint: in production, call Google Vision here and parse fields
+    _ocrText = '（圖片已上傳，正式版將自動辨識）';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ══════════════════════════════════════
+// EDIT
+// ══════════════════════════════════════
+function editRecord(id) {
+  const r = getById(id);
+  if (!r) return;
+  closeModal('detailModal');
+  setTimeout(() => {
+    showAddForm(r.type);
+    document.getElementById('addModalTitle').textContent = '編輯資料';
+    openModal('addModal');
+    // Pre-fill after DOM settles
+    setTimeout(() => {
+      const set = (fid, val) => { const el = document.getElementById(fid); if (el && val) el.value = val; };
+      set('f-name', r.name); set('f-company', r.company); set('f-title', r.title);
+      set('f-phone', r.phone); set('f-email', r.email); set('f-line', r.line);
+      set('f-keywords', r.keywords); set('f-content', r.content);
+      set('f-venue', r.venue); set('f-note', r.note);
+      set('f-category', r.category);
+      setImp(r.importance || 1);
+      // Override submit to update
+      const btn = document.querySelector('.btn-primary');
+      if (btn) btn.onclick = () => {
+        updateRecord(id, {
+          name: gv('f-name'), category: gv('f-category'),
+          company: gv('f-company'), title: gv('f-title'),
+          phone: gv('f-phone'), email: gv('f-email'), line: gv('f-line'),
+          keywords: gv('f-keywords'), content: gv('f-content'),
+          venue: gv('f-venue'), note: gv('f-note'), importance: _currentImp,
+        });
+        closeModal('addModal');
+        render();
+        showToast('✓ 已更新');
+      };
+    }, 60);
+  }, 300);
+}
+
+// ══════════════════════════════════════
+// MODAL HELPERS
+// ══════════════════════════════════════
+function openModal(id) {
+  const el = document.getElementById(id);
+  el.classList.add('open');
+  el.onclick = e => { if (e.target === el) closeModal(id); };
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// ══════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════
+function formatDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return `${d.getMonth()+1}/${d.getDate()}`;
+}
+function formatDateFull(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function toggleStorageInfo() {
+  showToast('目前使用本機儲存，資料僅存在此裝置');
+}
+
+// ══════════════════════════════════════
+// CATEGORY MANAGER
+// ══════════════════════════════════════
+function openCatManager() {
+  renderCatManager();
+  openModal('catModal');
+}
+
+function renderCatManager() {
+  CAT_MAP = getCAT_MAP();
+  const custom = loadCustomCats();
+  const usageCounts = {};
+  getAll().forEach(r => { usageCounts[r.category] = (usageCounts[r.category] || 0) + 1; });
+
+  const emojiOptions = ['🧪','🏭','📦','🔬','⚗️','💎','🎨','⭐','📢','🎯','🏪','🛒','✈️','🚚','🌏','🤝','📋','🏛️','⚖️','🛡️','💰','📑','🔭','📈','🔍','📝','🔗','👑','📌','💡','🌿','🧴','💄','🏷️','📊','🗂️'];
+
+  const groups = {};
+  Object.entries(CAT_MAP).forEach(([name, info]) => {
+    const g = info.group || '其他';
+    if (!groups[g]) groups[g] = [];
+    groups[g].push({ name, info, isCustom: !!custom[name] });
+  });
+
+  let html = '';
+
+  // New category form
+  html += `
+  <div class="card" style="margin-bottom:14px;background:var(--surface2)">
+    <div class="section-label" style="margin-bottom:10px">＋ 新增自訂分類</div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label class="form-label">分類名稱 *</label>
+      <input class="form-input" id="nc-name" placeholder="例：保養品研發">
+    </div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label class="form-label">群組（選填）</label>
+      <input class="form-input" id="nc-group" placeholder="例：產品與製造" list="group-list">
+      <datalist id="group-list">${[...new Set(Object.values(CAT_MAP).map(v=>v.group||'其他'))].map(g=>`<option value="${g}">`).join('')}</datalist>
+    </div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label class="form-label">圖示</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px" id="emoji-picker">
+        ${emojiOptions.map(e=>`<button type="button" onclick="pickEmoji('${e}')" style="font-size:20px;padding:4px 6px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer" id="ep-${e}">${e}</button>`).join('')}
+      </div>
+      <input id="nc-icon" type="hidden" value="📌">
+    </div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label class="form-label">顏色標籤</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${CAT_COLORS.map((c,i)=>`<button type="button" onclick="pickColor('${c}')" id="cp-${c}" style="padding:4px 12px;border-radius:12px;border:2px solid transparent;cursor:pointer;font-size:12px" class="${c}">Aa</button>`).join('')}
+      </div>
+      <input id="nc-color" type="hidden" value="${CAT_COLORS[0]}">
+    </div>
+    <button class="btn-primary" onclick="saveNewCat()">✓ 新增分類</button>
+  </div>`;
+
+  // Existing categories by group
+  html += `<div class="section-label">現有分類</div>`;
+  Object.entries(groups).forEach(([g, cats]) => {
+    html += `<div style="margin-bottom:4px;font-size:11px;color:var(--text3);padding:4px 0;border-bottom:1px solid var(--border)">${g}</div>`;
+    cats.forEach(({ name, info, isCustom }) => {
+      const count = usageCounts[name] || 0;
+      html += `<div style="display:flex;align-items:center;gap:8px;padding:8px 4px;border-bottom:1px solid var(--border)">
+        <span style="font-size:18px">${info.icon}</span>
+        <span class="tag ${info.color}" style="flex:1">${name}</span>
+        <span style="font-size:11px;color:var(--text3)">${count ? count+'筆' : ''}</span>
+        ${isCustom ? `<button onclick="deleteCustomCat('${name}')" style="background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:0 4px" title="刪除">×</button>` : '<span style="width:26px"></span>'}
+      </div>`;
+    });
+    html += `<div style="margin-bottom:10px"></div>`;
+  });
+
+  document.getElementById('catModalBody').innerHTML = html;
+  // highlight default emoji & color
+  pickColor(CAT_COLORS[0], true);
+}
+
+let _selEmoji = '📌', _selColor = CAT_COLORS[0];
+function pickEmoji(e) {
+  _selEmoji = e;
+  document.getElementById('nc-icon').value = e;
+  document.querySelectorAll('[id^="ep-"]').forEach(b => b.style.background = 'var(--surface)');
+  const btn = document.getElementById('ep-' + e);
+  if (btn) btn.style.background = 'var(--accent-glow)';
+}
+function pickColor(c, silent) {
+  _selColor = c;
+  document.getElementById('nc-color').value = c;
+  document.querySelectorAll('[id^="cp-"]').forEach(b => b.style.borderColor = 'transparent');
+  const btn = document.getElementById('cp-' + c);
+  if (btn) btn.style.borderColor = 'var(--accent)';
+}
+
+function saveNewCat() {
+  const name = document.getElementById('nc-name').value.trim();
+  if (!name) { showToast('請輸入分類名稱'); return; }
+  CAT_MAP = getCAT_MAP();
+  if (CAT_MAP[name]) { showToast('此分類已存在'); return; }
+  const group = document.getElementById('nc-group').value.trim() || '其他';
+  const icon = _selEmoji || '📌';
+  const color = _selColor || CAT_COLORS[0];
+  const custom = loadCustomCats();
+  custom[name] = { color, icon, group };
+  saveCustomCats(custom);
+  CAT_MAP = getCAT_MAP();
+  showToast('✓ 分類已新增');
+  renderCatManager();
+}
+
+function deleteCustomCat(name) {
+  const count = getAll().filter(r => r.category === name).length;
+  const msg = count > 0 ? `「${name}」已有 ${count} 筆資料使用中，確定刪除分類？（資料不會被刪除）` : `確定刪除「${name}」分類？`;
+  if (!confirm(msg)) return;
+  const custom = loadCustomCats();
+  delete custom[name];
+  saveCustomCats(custom);
+  CAT_MAP = getCAT_MAP();
+  showToast('已刪除分類');
+  renderCatManager();
+}
+
+// ══════════════════════════════════════
+// SEED DATA (demo)
+// ══════════════════════════════════════
+function seedIfEmpty() {
+  if (getAll().length > 0) return;
+  const demos = [
+    { type:'contact', name:'陳志明', company:'台灣美妝原料', title:'業務總監', phone:'0912-345-678', email:'chen@twraw.com', category:'供應鏈人脈', venue:'2024 台北國際美容展', importance:3, note:'專門供應玻尿酸、菸鹼醯胺等功能性原料，可以詢報價' },
+    { type:'contact', name:'林雅琪', company:'捷揚包裝', title:'客戶經理', email:'lin@jieyang.com', category:'通路人脈', venue:'2024 台北國際美容展', importance:2, note:'環保包材專家，有玻璃瓶和生質塑膠方案' },
+    { type:'dm', name:'SGS 化妝品安全測試服務簡介', company:'SGS Taiwan', keywords:'安全測試,防腐效力,重金屬,歐盟法規', category:'安全測試', venue:'2024 台北國際美容展', importance:2, note:'含台灣、歐盟、美國市場的測試套組報價' },
+    { type:'dm', name:'蝦皮商城美妝類入駐方案', company:'蝦皮購物', keywords:'電商,蝦皮,開店,物流,廣告投放', category:'電商平台', venue:'電商研討會', importance:1 },
+    { type:'note', name:'衛福部化妝品新規摘要（2024）', keywords:'化妝品法規,衛福部,GMP,標示,備查', category:'化妝品法規', venue:'法規說明會', importance:3, content:'2024年起所有化妝品須符合GMP規範，並於上市前完成備查登錄，有效成分濃度須符合公告限量…', note:'要讓代工廠確認是否已取得GMP認證' },
+    { type:'note', name:'日本市場進入策略筆記', keywords:'日本,薬機法,越境EC,代理商,Amazon JP', category:'海外市場情報', venue:'跨境電商論壇', importance:2, content:'日本進口化妝品需通過藥機法申報，建議找日本當地代理商協助，越境EC可先用Amazon JP測試市場反應…', note:'下次可聯繫林雅琪介紹的日本代理' },
+  ];
+  demos.forEach((d, i) => {
+    const db = loadDB();
+    const ts = new Date(Date.now() - i * 86400000 * 2).toISOString();
+    db.push({ ...d, id: (Date.now() + i).toString(), createdAt: ts });
+    localStorage.setItem(DB_KEY, JSON.stringify(db));
+  });
+  updateStats();
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+seedIfEmpty();
+updateStats();
+showPage('browse');
+</script>
+</body>
+</html>
