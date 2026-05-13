@@ -63,6 +63,13 @@ body {
 .topbar-logo { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
 .topbar-logo span { color: var(--accent); }
 .topbar-stats { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+.topbar-actions { display: flex; align-items: center; gap: 8px; }
+.icon-btn {
+  background: none; border: none; cursor: pointer; padding: 4px;
+  color: var(--text2); display: flex; align-items: center;
+}
+.icon-btn:hover { color: var(--accent); }
+.icon-btn svg { width: 18px; height: 18px; }
 
 .main { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 100px; }
 
@@ -100,13 +107,14 @@ body {
   display: flex; align-items: center; justify-content: center;
   font-size: 14px; font-weight: 700; flex-shrink: 0;
   font-family: var(--mono);
+  color: #fff;
 }
 .card-meta { flex: 1; min-width: 0; }
 .card-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .card-role { font-size: 11px; color: var(--text2); margin-top: 1px; }
-.card-date { font-size: 10px; color: var(--text3); font-family: var(--mono); }
+.card-date { font-size: 10px; color: var(--text3); font-family: var(--mono); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 
-.tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; align-items: center; }
 .tag {
   font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 500;
   font-family: var(--mono);
@@ -117,6 +125,16 @@ body {
 .tag-red { background: var(--red-bg); color: var(--red); }
 .tag-blue { background: var(--blue-bg); color: var(--blue); }
 .tag-pink { background: var(--pink-bg); color: var(--pink); }
+
+.user-tag {
+  font-size: 10px; padding: 2px 7px; border-radius: 20px;
+  background: rgba(45,125,210,0.05); color: var(--text2);
+  border: 1px solid rgba(45,125,210,0.18);
+  font-family: var(--mono); font-weight: 500;
+  cursor: pointer;
+}
+.user-tag::before { content: '#'; opacity: 0.5; margin-right: 1px; }
+.user-tag:hover { background: var(--accent-glow); color: var(--accent); }
 
 .card-note {
   font-size: 12px; color: var(--text2); margin-top: 8px;
@@ -136,6 +154,31 @@ body {
 .related-item:hover { background: var(--surface3); }
 .related-item-icon { font-size: 13px; }
 
+.reasons { display: inline-flex; gap: 3px; align-items: center; flex-wrap: wrap; }
+.reason-chip {
+  font-size: 9px; padding: 1px 6px; border-radius: 10px;
+  background: var(--surface3); color: var(--text2);
+  font-family: var(--mono); line-height: 1.5;
+}
+.reason-chip[data-k="link"] { background: var(--accent-glow); color: var(--accent); }
+.reason-chip[data-k="venue"] { background: var(--green-bg); color: var(--green); }
+.reason-chip[data-k="company"] { background: var(--blue-bg); color: var(--blue); }
+.reason-chip[data-k="topic"] { background: var(--amber-bg); color: var(--amber); }
+.reason-chip[data-k="tag"] { background: var(--pink-bg); color: var(--pink); }
+.reason-chip[data-k="category"] { background: var(--surface3); color: var(--text2); }
+
+/* Search highlight */
+mark { background: var(--amber-bg); color: var(--amber); padding: 0 1px; border-radius: 2px; font-weight: 600; }
+
+/* Follow-up badge */
+.followup-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 10px; padding: 2px 7px; border-radius: 12px;
+  background: var(--amber-bg); color: var(--amber);
+  font-family: var(--mono);
+}
+.followup-overdue { background: var(--red-bg); color: var(--red); }
+
 /* ── Search ── */
 .search-wrap { position: relative; margin-bottom: 14px; }
 .search-input {
@@ -148,8 +191,8 @@ body {
 .search-input::placeholder { color: var(--text3); }
 .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text3); pointer-events: none; }
 
-/* ── Filter tabs ── */
-.filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; scrollbar-width: none; }
+/* ── Filter / Sort bar ── */
+.filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 10px; scrollbar-width: none; }
 .filter-row::-webkit-scrollbar { display: none; }
 .filter-btn {
   padding: 5px 12px; border-radius: 20px; font-size: 12px; white-space: nowrap;
@@ -158,11 +201,30 @@ body {
 }
 .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
+.sort-bar {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  font-size: 11px; color: var(--text3); font-family: var(--mono);
+}
+.sort-bar select {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; padding: 4px 22px 4px 8px; color: var(--text);
+  font-family: var(--mono); font-size: 11px; outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236b6860' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+}
+
 /* ── Section label ── */
 .section-label {
   font-size: 10px; color: var(--text3); font-family: var(--mono);
   letter-spacing: .08em; text-transform: uppercase;
   margin-bottom: 10px; margin-top: 4px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.section-label .link {
+  font-size: 10px; color: var(--accent); cursor: pointer;
+  text-transform: none; letter-spacing: 0;
 }
 
 /* ── FAB ── */
@@ -216,6 +278,37 @@ body {
 .form-select option { background: var(--surface2); }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
+/* Tag input */
+.tag-input-wrap {
+  display: flex; flex-wrap: wrap; gap: 5px; align-items: center;
+  padding: 8px 10px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); min-height: 42px;
+  cursor: text;
+}
+.tag-input-wrap:focus-within { border-color: var(--accent); }
+.tag-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--accent-glow); color: var(--accent);
+  padding: 2px 4px 2px 8px; border-radius: 12px; font-size: 11px;
+  font-family: var(--mono);
+}
+.tag-chip-x { cursor: pointer; opacity: 0.6; font-size: 14px; line-height: 1; padding: 0 4px; }
+.tag-chip-x:hover { opacity: 1; }
+.tag-input {
+  flex: 1; min-width: 80px; border: none; outline: none;
+  background: transparent; font-size: 13px; font-family: var(--font);
+  color: var(--text); padding: 4px 2px;
+}
+.tag-suggest-row { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px; }
+.tag-suggest {
+  font-size: 10px; padding: 2px 7px; border-radius: 12px;
+  background: var(--surface3); color: var(--text2); cursor: pointer;
+  border: 1px solid var(--border); font-family: var(--mono);
+}
+.tag-suggest:hover { background: var(--accent-glow); color: var(--accent); border-color: var(--accent); }
+.tag-suggest::before { content: '#'; opacity: 0.5; margin-right: 1px; }
+
 /* ── Importance stars ── */
 .star-row { display: flex; gap: 6px; }
 .star-btn { background: none; border: none; cursor: pointer; font-size: 22px; color: var(--text3); transition: color .15s; line-height: 1; }
@@ -263,15 +356,39 @@ input[type=file] { display: none; }
   width: 60px; height: 60px; border-radius: 14px;
   display: flex; align-items: center; justify-content: center;
   font-size: 20px; font-weight: 700; margin: 0 auto 12px;
-  font-family: var(--mono);
+  font-family: var(--mono); color: #fff;
 }
 .detail-name { text-align: center; font-size: 18px; font-weight: 600; }
 .detail-role { text-align: center; font-size: 12px; color: var(--text2); margin-top: 2px; }
 .detail-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--border); }
 .detail-row:last-child { border-bottom: none; }
 .detail-row-icon { font-size: 16px; width: 24px; text-align: center; color: var(--text3); flex-shrink: 0; }
-.detail-row-label { font-size: 11px; color: var(--text3); width: 56px; flex-shrink: 0; }
-.detail-row-val { font-size: 13px; color: var(--text); flex: 1; }
+.detail-row-label { font-size: 11px; color: var(--text3); width: 60px; flex-shrink: 0; }
+.detail-row-val { font-size: 13px; color: var(--text); flex: 1; word-break: break-word; }
+
+/* Relations in detail */
+.rel-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  margin-bottom: 6px; background: var(--surface);
+}
+.rel-card-main { flex: 1; min-width: 0; cursor: pointer; }
+.rel-card-name { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rel-card-sub { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-top: 2px; }
+.rel-unlink {
+  background: none; border: none; color: var(--text3);
+  cursor: pointer; padding: 4px 8px; font-size: 14px; line-height: 1;
+}
+.rel-unlink:hover { color: var(--red); }
+
+/* Picker (for linking) */
+.picker-result {
+  padding: 8px 10px; border-radius: 6px;
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; margin-bottom: 4px;
+  border: 1px solid transparent;
+}
+.picker-result:hover { background: var(--surface2); border-color: var(--border); }
 
 /* ── Empty state ── */
 .empty { text-align: center; padding: 60px 20px; color: var(--text3); }
@@ -284,14 +401,27 @@ input[type=file] { display: none; }
 .stat-num { font-size: 26px; font-weight: 700; font-family: var(--mono); color: var(--text); }
 .stat-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
 
+/* Stat bars */
+.stat-bar-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; padding: 4px 0; cursor: pointer;
+}
+.stat-bar-row:hover .stat-bar-label { color: var(--accent); }
+.stat-bar-label { width: 90px; color: var(--text2); flex-shrink: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  display: flex; align-items: center; gap: 4px; }
+.stat-bar-track { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.stat-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width .3s; }
+.stat-bar-num { font-family: var(--mono); color: var(--text3); width: 28px; text-align: right; font-size: 10px; }
+
 /* ── Loading ── */
 .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.2); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── Type icon map ── */
-.type-contact { background: var(--blue-bg); color: var(--blue); }
-.type-dm { background: var(--pink-bg); color: var(--pink); }
-.type-note { background: var(--green-bg); color: var(--green); }
+.type-contact { background: var(--blue-bg) !important; color: var(--blue) !important; }
+.type-dm { background: var(--pink-bg) !important; color: var(--pink) !important; }
+.type-note { background: var(--green-bg) !important; color: var(--green) !important; }
 
 /* ── Importance indicator ── */
 .imp-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; }
@@ -309,12 +439,290 @@ input[type=file] { display: none; }
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+/* Undo bar */
+.undo-bar {
+  position: fixed; bottom: 90px; left: 16px; right: 16px;
+  background: #1a1a18; color: #fff; border-radius: var(--radius);
+  padding: 12px 14px; display: flex; align-items: center; gap: 10px;
+  z-index: 150; opacity: 0; transform: translateY(20px);
+  transition: opacity .2s, transform .2s; pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+.undo-bar.show { opacity: 1; transform: translateY(0); pointer-events: all; }
+.undo-bar-msg { flex: 1; font-size: 13px; }
+.undo-bar-btn {
+  background: none; border: none; color: #5ba7ff;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  padding: 4px 8px; font-family: var(--font);
+}
+.undo-bar-timer {
+  font-family: var(--mono); font-size: 10px;
+  color: rgba(255,255,255,0.5); width: 18px; text-align: center;
+}
+
 /* ── Storage toggle ── */
 .storage-badge {
   font-size: 10px; font-family: var(--mono);
   padding: 3px 8px; border-radius: 12px;
   background: var(--blue-bg); color: var(--blue); cursor: pointer;
   border: 1px solid rgba(45,125,210,0.2);
+}
+.storage-badge.warn { background: var(--amber-bg); color: var(--amber); border-color: rgba(160,96,16,0.2); }
+
+/* Duplicate warning */
+.dup-warn {
+  background: var(--amber-bg); border-left: 3px solid var(--amber);
+  border-radius: var(--radius-sm); padding: 12px;
+  margin-bottom: 12px; font-size: 12px; color: var(--amber);
+}
+.dup-warn-title { font-weight: 600; margin-bottom: 6px; }
+.dup-warn-card {
+  background: var(--surface); color: var(--text); padding: 8px;
+  border-radius: 6px; margin-top: 8px; cursor: pointer;
+  display: flex; gap: 8px; align-items: center;
+}
+
+/* ═══════════════════════════════════════════════════════
+   v2.1: Compact mode, Pin button, Smart Views, Group Views
+   ═══════════════════════════════════════════════════════ */
+
+.card { position: relative; }
+
+/* Pin button (subtle on cards, prominent in detail) */
+.pin-btn {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: none; border: none; cursor: pointer;
+  color: var(--text3); opacity: 0.3;
+  font-size: 14px; padding: 4px 6px; line-height: 1;
+  transition: opacity .15s, color .15s, transform .1s;
+  z-index: 2; border-radius: 6px;
+}
+.card:hover .pin-btn { opacity: 0.65; }
+.pin-btn:hover { opacity: 1; color: var(--amber); background: var(--surface2); }
+.pin-btn:active { transform: scale(.9); }
+.pin-btn.pinned { opacity: 1; color: var(--amber); }
+
+/* Compact mode cards */
+.card.compact {
+  padding: 8px 10px;
+  margin-bottom: 4px;
+}
+.card.compact .card-header { margin-bottom: 0; gap: 8px; align-items: center; }
+.card.compact .avatar { width: 32px; height: 32px; font-size: 11px; border-radius: 8px; }
+.card.compact .card-name { font-size: 13px; }
+.card.compact .card-role { font-size: 10px; }
+.card.compact .card-date { font-size: 10px; }
+.card.compact .tags,
+.card.compact .card-note,
+.card.compact .related-section { display: none; }
+.card.compact .pin-btn { top: 6px; right: 6px; font-size: 12px; }
+.card.compact .card-meta { padding-right: 24px; }
+
+/* Smart view tiles row */
+.smart-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.smart-tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 10px;
+  transition: border-color .15s, transform .1s;
+}
+.smart-tile:hover { border-color: var(--accent); }
+.smart-tile:active { transform: scale(.98); }
+.smart-tile-icon { font-size: 18px; flex-shrink: 0; }
+.smart-tile-body { flex: 1; min-width: 0; }
+.smart-tile-num { font-size: 17px; font-weight: 600; font-family: var(--mono); line-height: 1.1; }
+.smart-tile-label { font-size: 10px; color: var(--text2); margin-top: 3px; }
+.smart-tile[data-kind="dormant"]   { border-left: 3px solid var(--amber); }
+.smart-tile[data-kind="incomplete"]{ border-left: 3px solid var(--red); }
+.smart-tile[data-kind="recent"]    { border-left: 3px solid var(--green); }
+.smart-tile[data-kind="archived"]  { border-left: 3px solid var(--text3); }
+.smart-tile[data-kind="pinned"]    { border-left: 3px solid var(--amber); }
+.smart-tile[data-kind="company"]   { border-left: 3px solid var(--blue); }
+.smart-tile[data-kind="venue"]     { border-left: 3px solid var(--accent); }
+
+/* View header (for non-tab pages) */
+.view-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.back-btn {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; cursor: pointer;
+  color: var(--text2); padding: 6px 8px;
+  display: flex; align-items: center; gap: 4px;
+  font-family: var(--font); font-size: 12px; flex-shrink: 0;
+}
+.back-btn:hover { color: var(--accent); border-color: var(--accent); }
+.view-title { font-size: 15px; font-weight: 600; flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.view-subtitle { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+
+/* Group summary (for company/venue view) */
+.group-summary {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 12px;
+  display: flex; gap: 12px; align-items: center;
+}
+.group-summary-icon { font-size: 28px; flex-shrink: 0; }
+.group-summary-body { flex: 1; min-width: 0; }
+.group-summary-name { font-size: 16px; font-weight: 600; word-break: break-word; }
+.group-summary-stats { font-size: 11px; color: var(--text2); margin-top: 4px; font-family: var(--mono); }
+
+/* Group list items (for /companies, /venues) */
+.group-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.group-item:hover { border-color: var(--accent); }
+.group-item-icon { font-size: 18px; flex-shrink: 0; }
+.group-item-body { flex: 1; min-width: 0; }
+.group-item-name {
+  font-size: 13px; font-weight: 500;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.group-item-meta { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-top: 2px; }
+.group-item-pills { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+.type-pill {
+  font-size: 9px; padding: 1px 6px; border-radius: 6px;
+  font-family: var(--mono);
+}
+.group-item-count {
+  font-family: var(--mono); font-size: 14px; color: var(--text2);
+  font-weight: 500; flex-shrink: 0;
+}
+
+/* Compact / archive toggles */
+.view-toggle {
+  background: none; border: 1px solid var(--border);
+  border-radius: 6px; padding: 4px 9px;
+  cursor: pointer; font-family: var(--mono); font-size: 10px;
+  color: var(--text2);
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.view-toggle:hover { color: var(--accent); border-color: var(--accent); }
+.view-toggle.active { background: var(--accent-glow); color: var(--accent); border-color: var(--accent); }
+
+/* Show more / load more */
+.show-more {
+  width: 100%; padding: 10px; margin-top: 4px;
+  background: transparent; border: 1px dashed var(--border2);
+  border-radius: var(--radius-sm); cursor: pointer;
+  color: var(--text2); font-family: var(--font); font-size: 12px;
+}
+.show-more:hover { background: var(--surface2); color: var(--accent); border-color: var(--accent); }
+
+/* Archive badge on cards */
+.archive-badge {
+  font-size: 9px; padding: 1px 6px; border-radius: 8px;
+  background: var(--surface3); color: var(--text3);
+  font-family: var(--mono); margin-left: 4px;
+}
+
+/* Clickable company/venue text in cards */
+.clickable-meta { cursor: pointer; }
+.clickable-meta:hover { color: var(--accent); text-decoration: underline; }
+
+/* ═══════════════════════════════════════════════════════
+   v2.2: Lecture notes + AI extraction
+   ═══════════════════════════════════════════════════════ */
+
+.type-lecture { background: rgba(160,96,16,0.12) !important; color: var(--amber) !important; }
+
+/* Transcript upload result */
+.transcript-file-info {
+  background: var(--green-bg);
+  border-left: 3px solid var(--green);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin-top: 8px;
+  font-size: 12px; color: var(--green);
+  display: flex; align-items: center; gap: 8px;
+}
+.transcript-file-info .name { font-weight: 500; flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.transcript-file-info .meta { font-family: var(--mono); font-size: 10px; opacity: 0.7; }
+
+/* AI extraction result section */
+.ai-section {
+  background: var(--surface2);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+.ai-label {
+  font-size: 11px; color: var(--accent); font-family: var(--mono);
+  letter-spacing: 0.05em; margin-bottom: 6px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ai-input {
+  border: 1px solid transparent !important;
+  background: var(--surface) !important;
+  padding: 8px 10px !important;
+  font-size: 13px !important;
+}
+.ai-input:focus { border-color: var(--accent) !important; }
+
+/* Lecture detail view sections */
+.lecture-summary {
+  background: var(--blue-bg);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 13px; line-height: 1.7;
+}
+.kp-list { list-style: none; padding: 0; margin: 6px 0 0; font-size: 13px; }
+.kp-list li {
+  padding: 5px 0 5px 22px;
+  position: relative;
+  line-height: 1.55;
+  border-bottom: 1px dashed var(--border);
+}
+.kp-list li:last-child { border-bottom: none; }
+.kp-list li::before {
+  content: '•';
+  position: absolute;
+  left: 6px;
+  color: var(--accent);
+  font-weight: bold;
+}
+.action-list li::before { content: '◯'; font-size: 11px; top: 6px; left: 5px; }
+
+.transcript-box {
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-size: 12px; color: var(--text2);
+  line-height: 1.8;
+  max-height: 240px; overflow-y: auto;
+  font-family: var(--font);
+  white-space: pre-wrap;
+  margin-top: 6px;
+}
+.collapse-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--accent); font-size: 11px; font-family: var(--mono);
+  padding: 4px 0;
 }
 </style>
 </head>
@@ -324,9 +732,12 @@ input[type=file] { display: none; }
 <!-- Top bar -->
 <div class="topbar">
   <div class="topbar-logo">知識<span>·</span>人脈庫</div>
-  <div style="display:flex;align-items:center;gap:8px">
-    <span class="storage-badge" id="storageBadge" onclick="toggleStorageInfo()">本機模式</span>
+  <div class="topbar-actions">
+    <span class="storage-badge" id="storageBadge" onclick="openMenu()">本機模式</span>
     <span class="topbar-stats" id="topStats">0 筆資料</span>
+    <button class="icon-btn" onclick="openMenu()" title="選單">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+    </button>
   </div>
 </div>
 
@@ -399,102 +810,188 @@ input[type=file] { display: none; }
   </div>
 </div>
 
-<!-- Toast -->
+<!-- Menu Modal -->
+<div class="modal-overlay" id="menuModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">選單</span>
+      <button class="modal-close" onclick="closeModal('menuModal')">×</button>
+    </div>
+    <div class="modal-body" id="menuModalBody"></div>
+  </div>
+</div>
 
+<!-- Picker Modal (for relations) -->
+<div class="modal-overlay" id="pickerModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">選擇要連結的資料</span>
+      <button class="modal-close" onclick="closeModal('pickerModal')">×</button>
+    </div>
+    <div class="modal-body" id="pickerModalBody"></div>
+  </div>
+</div>
+
+<!-- Toast & Undo -->
 <div class="toast" id="toast"></div>
+<div class="undo-bar" id="undoBar">
+  <span class="undo-bar-msg" id="undoMsg">已刪除</span>
+  <span class="undo-bar-timer" id="undoTimer">5</span>
+  <button class="undo-bar-btn" onclick="undoLast()">復原</button>
+</div>
+
+<input type="file" id="importFileInput" accept="application/json" style="display:none" onchange="handleImport(this)">
 
 <script>
-// ══════════════════════════════════════
-// DATA LAYER — localStorage (swap to Supabase later)
-// ══════════════════════════════════════
-const DB_KEY = 'knowledgehub_v1';
+// ══════════════════════════════════════════════════════════════
+// CONFIG & MIGRATION
+// ══════════════════════════════════════════════════════════════
+const DB_KEY = 'knowledgehub_v2';
+const LEGACY_KEY = 'knowledgehub_v1';
+const CATS_KEY = 'knowledgehub_cats';
+const BACKUP_KEY = 'knowledgehub_lastbackup';
+const BACKUP_WARN_DAYS = 14;
 
+(function migrate(){
+  // v1 -> v2: add tags, linkedIds, updatedAt, followupAt
+  if (localStorage.getItem(DB_KEY)) return;
+  const v1 = localStorage.getItem(LEGACY_KEY);
+  if (!v1) return;
+  try {
+    const data = JSON.parse(v1) || [];
+    const migrated = data.map(r => ({
+      ...r,
+      tags: Array.isArray(r.tags) ? r.tags : [],
+      linkedIds: Array.isArray(r.linkedIds) ? r.linkedIds : [],
+      updatedAt: r.updatedAt || r.createdAt,
+      followupAt: r.followupAt || null,
+    }));
+    localStorage.setItem(DB_KEY, JSON.stringify(migrated));
+  } catch(e) { console.warn('v1 migration failed', e); }
+})();
+
+// ══════════════════════════════════════════════════════════════
+// DATA LAYER
+// ══════════════════════════════════════════════════════════════
 function loadDB() {
   try { return JSON.parse(localStorage.getItem(DB_KEY)) || []; }
   catch { return []; }
 }
 function saveDB(data) {
   localStorage.setItem(DB_KEY, JSON.stringify(data));
+  _indexCache = null;
   updateStats();
 }
 function getAll() { return loadDB(); }
 function getById(id) { return loadDB().find(r => r.id === id); }
+
 function addRecord(rec) {
   const db = loadDB();
-  db.unshift({ ...rec, id: Date.now().toString(), createdAt: new Date().toISOString() });
+  const now = new Date().toISOString();
+  const newRec = {
+    tags: [], linkedIds: [], followupAt: null,
+    ...rec,
+    id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
+    createdAt: now, updatedAt: now,
+  };
+  db.unshift(newRec);
   saveDB(db);
+  return newRec;
 }
 function updateRecord(id, updates) {
   const db = loadDB();
   const idx = db.findIndex(r => r.id === id);
-  if (idx !== -1) { db[idx] = { ...db[idx], ...updates }; saveDB(db); }
+  if (idx !== -1) {
+    db[idx] = { ...db[idx], ...updates, updatedAt: new Date().toISOString() };
+    saveDB(db);
+  }
 }
 function deleteRecord(id) {
-  saveDB(loadDB().filter(r => r.id !== id));
+  const db = loadDB();
+  const removed = db.find(r => r.id === id);
+  if (!removed) return null;
+  // Clean up linkedIds in other records pointing here
+  const filtered = db.filter(r => r.id !== id).map(r => ({
+    ...r,
+    linkedIds: (r.linkedIds || []).filter(lid => lid !== id),
+  }));
+  saveDB(filtered);
+  return removed;
 }
 
-// ══════════════════════════════════════
-// CATEGORIES & COLORS
-// ══════════════════════════════════════
+// Bi-directional link management
+function linkRecords(idA, idB) {
+  if (idA === idB) return;
+  const db = loadDB();
+  const a = db.find(r => r.id === idA);
+  const b = db.find(r => r.id === idB);
+  if (!a || !b) return;
+  a.linkedIds = [...new Set([...(a.linkedIds || []), idB])];
+  b.linkedIds = [...new Set([...(b.linkedIds || []), idA])];
+  a.updatedAt = b.updatedAt = new Date().toISOString();
+  saveDB(db);
+}
+function unlinkRecords(idA, idB) {
+  const db = loadDB();
+  const a = db.find(r => r.id === idA);
+  const b = db.find(r => r.id === idB);
+  if (a) a.linkedIds = (a.linkedIds || []).filter(x => x !== idB);
+  if (b) b.linkedIds = (b.linkedIds || []).filter(x => x !== idA);
+  saveDB(db);
+}
+
+// ══════════════════════════════════════════════════════════════
+// CATEGORIES (same domain knowledge as before)
+// ══════════════════════════════════════════════════════════════
 const DEFAULT_CATS = {
-  // 產品與製造
   '原料供應商':   { color: 'tag-green',  icon: '🧪', group: '產品與製造' },
   '代工廠／OEM': { color: 'tag-green',  icon: '🏭', group: '產品與製造' },
   '包裝材料商':   { color: 'tag-green',  icon: '📦', group: '產品與製造' },
   '檢驗認證機構': { color: 'tag-green',  icon: '🔬', group: '產品與製造' },
   '研發技術':     { color: 'tag-green',  icon: '⚗️', group: '產品與製造' },
-  // 品牌與行銷
   '品牌策略':     { color: 'tag-pink',   icon: '💎', group: '品牌與行銷' },
   '視覺設計':     { color: 'tag-pink',   icon: '🎨', group: '品牌與行銷' },
   'KOL／網紅':   { color: 'tag-pink',   icon: '⭐', group: '品牌與行銷' },
   '廣告投放':     { color: 'tag-pink',   icon: '📢', group: '品牌與行銷' },
   '行銷活動':     { color: 'tag-pink',   icon: '🎯', group: '品牌與行銷' },
-  // 通路與電商
   '實體通路':     { color: 'tag-blue',   icon: '🏪', group: '通路與電商' },
   '電商平台':     { color: 'tag-blue',   icon: '🛒', group: '通路與電商' },
   '跨境通路':     { color: 'tag-blue',   icon: '✈️', group: '通路與電商' },
   '物流倉儲':     { color: 'tag-blue',   icon: '🚚', group: '通路與電商' },
-  // 跨境與海外
   '海外市場情報': { color: 'tag-cat',    icon: '🌏', group: '跨境與海外' },
   '海外代理商':   { color: 'tag-cat',    icon: '🤝', group: '跨境與海外' },
   '關稅法規':     { color: 'tag-cat',    icon: '📋', group: '跨境與海外' },
   '海外展覽':     { color: 'tag-cat',    icon: '🏛️', group: '跨境與海外' },
-  // 法規與認證
   '化妝品法規':   { color: 'tag-amber',  icon: '⚖️', group: '法規與認證' },
   '安全測試':     { color: 'tag-amber',  icon: '🛡️', group: '法規與認證' },
   '政府補助':     { color: 'tag-amber',  icon: '💰', group: '法規與認證' },
   '標案資訊':     { color: 'tag-amber',  icon: '📑', group: '法規與認證' },
-  // 知識與研究
   '成分技術':     { color: 'tag-green',  icon: '🔭', group: '知識與研究' },
   '市場趨勢':     { color: 'tag-green',  icon: '📈', group: '知識與研究' },
   '競品分析':     { color: 'tag-green',  icon: '🔍', group: '知識與研究' },
   '展覽筆記':     { color: 'tag-green',  icon: '📝', group: '知識與研究' },
-  // 人脈
   '供應鏈人脈':   { color: 'tag-blue',   icon: '🔗', group: '人脈' },
   '品牌人脈':     { color: 'tag-blue',   icon: '👑', group: '人脈' },
   '通路人脈':     { color: 'tag-blue',   icon: '🤝', group: '人脈' },
   '政府／公協會': { color: 'tag-blue',   icon: '🏛️', group: '人脈' },
-  // 其他
   '其他':         { color: 'tag-amber',  icon: '📌', group: '其他' },
 };
-
 const CAT_COLORS = ['tag-green','tag-pink','tag-blue','tag-cat','tag-amber','tag-red'];
 
 function loadCustomCats() {
-  try { return JSON.parse(localStorage.getItem('knowledgehub_cats')) || {}; } catch { return {}; }
+  try { return JSON.parse(localStorage.getItem(CATS_KEY)) || {}; } catch { return {}; }
 }
-function saveCustomCats(obj) { localStorage.setItem('knowledgehub_cats', JSON.stringify(obj)); }
-
-function getCAT_MAP() {
-  const custom = loadCustomCats();
-  return { ...DEFAULT_CATS, ...custom };
-}
-// Keep CAT_MAP as a live proxy getter for backward compat
+function saveCustomCats(obj) { localStorage.setItem(CATS_KEY, JSON.stringify(obj)); }
+function getCAT_MAP() { return { ...DEFAULT_CATS, ...loadCustomCats() }; }
 let CAT_MAP = getCAT_MAP();
+
 const TYPE_MAP = {
   contact: { label: '名片', icon: '👤', cls: 'type-contact' },
-  dm:      { label: 'DM', icon: '📄', cls: 'type-dm' },
+  dm:      { label: 'DM',   icon: '📄', cls: 'type-dm' },
   note:    { label: '筆記', icon: '📝', cls: 'type-note' },
+  lecture: { label: '上課', icon: '🎓', cls: 'type-lecture' },
 };
 const IMP_MAP = { 1: { cls: 'imp-1', label: '備用' }, 2: { cls: 'imp-2', label: '重要' }, 3: { cls: 'imp-3', label: '必用' } };
 
@@ -512,83 +1009,625 @@ function avatarBg(str) {
   return palette[Math.abs(h) % palette.length];
 }
 
-// ══════════════════════════════════════
-// NAVIGATION
-// ══════════════════════════════════════
-let currentPage = 'browse';
-let currentFilter = 'all';
+// ══════════════════════════════════════════════════════════════
+// TOKENIZER + INVERTED INDEX (TF-IDF scoring)
+//   - For CJK: extract bigrams + trigrams (no word boundaries)
+//   - For Latin: split on non-word boundaries, lowercase
+//   - IDF down-weights common tokens automatically
+// ══════════════════════════════════════════════════════════════
+function tokenize(text) {
+  if (!text) return [];
+  const t = String(text).toLowerCase();
+  const tokens = new Set();
+  // Latin / digit words (>=2 chars)
+  (t.match(/[a-z0-9]{2,}/g) || []).forEach(w => tokens.add(w));
+  // CJK segments
+  const cjkSegs = t.replace(/[^\u4e00-\u9fff]/g, ' ').split(/\s+/).filter(Boolean);
+  cjkSegs.forEach(seg => {
+    if (seg.length === 1) tokens.add(seg);
+    for (let i = 0; i < seg.length - 1; i++) tokens.add(seg.substr(i, 2));
+    for (let i = 0; i < seg.length - 2; i++) tokens.add(seg.substr(i, 3));
+  });
+  return [...tokens];
+}
 
-function showPage(page) {
-  currentPage = page;
+function recordText(r) {
+  return [
+    r.name, r.company, r.title, r.keywords, r.content,
+    r.note, r.venue, r.category, r.speaker,
+    r.transcript, r.summary,
+    (r.keypoints || []).join(' '),
+    (r.actionItems || []).join(' '),
+    (r.tags || []).join(' '),
+  ].filter(Boolean).join(' ');
+}
+
+let _indexCache = null;
+function getIndex() {
+  if (_indexCache) return _indexCache;
+  const all = getAll();
+  const N = Math.max(all.length, 1);
+  const docTokens = new Map(); // id -> Set
+  const df = new Map();        // token -> doc count
+  all.forEach(r => {
+    const set = new Set(tokenize(recordText(r)));
+    docTokens.set(r.id, set);
+    set.forEach(tok => df.set(tok, (df.get(tok) || 0) + 1));
+  });
+  const idf = new Map();
+  df.forEach((count, tok) => {
+    // smoothed IDF; common terms ~0, rare terms higher
+    idf.set(tok, Math.log((N + 1) / (count + 1)) + 0.1);
+  });
+  _indexCache = { docTokens, idf, N, all };
+  return _indexCache;
+}
+
+// Scored search: returns records sorted by TF-IDF score, with matched tokens for highlighting
+function searchScored(query) {
+  const q = (query || '').trim();
+  if (!q) return [];
+  const qTokens = tokenize(q);
+  if (qTokens.length === 0) return [];
+  const idx = getIndex();
+  const scores = new Map();
+  const matchedByDoc = new Map();
+  qTokens.forEach(tok => {
+    const w = idx.idf.get(tok);
+    if (!w) return;
+    idx.docTokens.forEach((tokens, id) => {
+      if (tokens.has(tok)) {
+        scores.set(id, (scores.get(id) || 0) + w);
+        if (!matchedByDoc.has(id)) matchedByDoc.set(id, new Set());
+        matchedByDoc.get(id).add(tok);
+      }
+    });
+  });
+  const byId = new Map(idx.all.map(r => [r.id, r]));
+  return Array.from(scores.entries())
+    .map(([id, score]) => ({ ...byId.get(id), _score: score, _matched: matchedByDoc.get(id) }))
+    .sort((a, b) => b._score - a._score);
+}
+
+// Multi-factor related records
+// Score combines: explicit link, shared tags, same venue/company/category,
+// and TF-IDF text similarity (which naturally handles Chinese without word boundaries)
+function findRelated(record) {
+  const idx = getIndex();
+  const ownTokens = idx.docTokens.get(record.id) || new Set();
+  const ownTags = new Set(record.tags || []);
+  const linked = new Set(record.linkedIds || []);
+  const out = [];
+  idx.all.forEach(r => {
+    if (r.id === record.id) return;
+    let score = 0;
+    const reasons = [];
+    if (linked.has(r.id) || (r.linkedIds || []).includes(record.id)) {
+      score += 20;
+      reasons.push({ k: 'link', t: '已連結' });
+    }
+    if (record.venue && r.venue && record.venue === r.venue) {
+      score += 5;
+      reasons.push({ k: 'venue', t: '同場合' });
+    }
+    if (record.company && r.company && record.company === r.company) {
+      score += 4;
+      reasons.push({ k: 'company', t: '同公司' });
+    }
+    const sharedTags = (r.tags || []).filter(t => ownTags.has(t));
+    if (sharedTags.length > 0) {
+      score += sharedTags.length * 2.5;
+      reasons.push({ k: 'tag', t: sharedTags.length === 1 ? `#${sharedTags[0]}` : `${sharedTags.length} 個共同標籤` });
+    }
+    if (record.category && r.category && record.category === r.category) {
+      score += 1.5;
+      reasons.push({ k: 'category', t: '同類' });
+    }
+    // TF-IDF text similarity
+    const otherTokens = idx.docTokens.get(r.id) || new Set();
+    let textScore = 0;
+    let overlap = 0;
+    ownTokens.forEach(t => {
+      if (otherTokens.has(t)) {
+        textScore += idx.idf.get(t) || 0;
+        overlap++;
+      }
+    });
+    // Threshold: avoid noise from very common single-char overlaps
+    if (textScore >= 1.5) {
+      score += textScore;
+      reasons.push({ k: 'topic', t: `主題相關 ${overlap}` });
+    }
+    if (score <= 0) return;
+    // Importance soft multiplier (related to higher-importance records gets a bump)
+    score *= 1 + ((r.importance || 1) - 1) * 0.15;
+    out.push({ ...r, _score: score, _reasons: reasons });
+  });
+  return out.sort((a, b) => b._score - a._score);
+}
+
+// ══════════════════════════════════════════════════════════════
+// TAGS (free-form, auto-collected)
+// ══════════════════════════════════════════════════════════════
+function getAllTags() {
+  const counts = new Map();
+  getAll().forEach(r => (r.tags || []).forEach(t => counts.set(t, (counts.get(t) || 0) + 1)));
+  return [...counts.entries()].sort((a, b) => b[1] - a[1]);
+}
+
+function suggestTags(currentList, currentInput) {
+  const all = getAllTags();
+  const cur = new Set(currentList);
+  const input = (currentInput || '').toLowerCase();
+  return all
+    .filter(([t]) => !cur.has(t))
+    .filter(([t]) => !input || t.toLowerCase().includes(input))
+    .slice(0, 8)
+    .map(([t]) => t);
+}
+
+// ══════════════════════════════════════════════════════════════
+// DUPLICATE DETECTION
+// ══════════════════════════════════════════════════════════════
+function normalizePhone(p) { return (p || '').replace(/\D+/g, ''); }
+function normalizeEmail(e) { return (e || '').trim().toLowerCase(); }
+function findDuplicates(candidate, excludeId) {
+  const all = getAll().filter(r => r.id !== excludeId);
+  const phone = normalizePhone(candidate.phone);
+  const email = normalizeEmail(candidate.email);
+  const nameLc = (candidate.name || '').trim().toLowerCase();
+  const companyLc = (candidate.company || '').trim().toLowerCase();
+  const hits = [];
+  all.forEach(r => {
+    if (phone && phone.length >= 8 && normalizePhone(r.phone) === phone) {
+      hits.push({ r, why: '電話相同' }); return;
+    }
+    if (email && normalizeEmail(r.email) === email) {
+      hits.push({ r, why: 'Email 相同' }); return;
+    }
+    if (nameLc && (r.name || '').trim().toLowerCase() === nameLc) {
+      if (companyLc && (r.company || '').trim().toLowerCase() === companyLc) {
+        hits.push({ r, why: '同名同公司' }); return;
+      }
+      if (!companyLc && !(r.company || '').trim()) {
+        hits.push({ r, why: '同名' });
+      }
+    }
+  });
+  return hits;
+}
+
+// ══════════════════════════════════════════════════════════════
+// FOLLOW-UPS
+// ══════════════════════════════════════════════════════════════
+function followupStatus(iso) {
+  if (!iso) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(iso); d.setHours(0,0,0,0);
+  const diff = Math.round((d - today) / 86400000);
+  if (diff < 0) return { kind: 'overdue', days: -diff, label: `逾期 ${-diff}天` };
+  if (diff === 0) return { kind: 'today', days: 0, label: '今日跟進' };
+  if (diff <= 7) return { kind: 'soon', days: diff, label: `${diff}天後` };
+  return { kind: 'future', days: diff, label: formatDate(iso) };
+}
+function getFollowupsDue() {
+  return getAll()
+    .filter(r => r.followupAt)
+    .map(r => ({ r, st: followupStatus(r.followupAt) }))
+    .filter(x => x.st && (x.st.kind === 'overdue' || x.st.kind === 'today' || x.st.kind === 'soon'))
+    .sort((a, b) => a.st.days - b.st.days);
+}
+
+// ══════════════════════════════════════════════════════════════
+// SMART VIEW CRITERIA (Layer 1)
+// ══════════════════════════════════════════════════════════════
+const DAY = 86400000;
+
+// Auto-archive: importance == 1 AND > 365 days since updatedAt; pinned records never archived
+function isArchived(r) {
+  if (r.pinned) return false;
+  if ((r.importance || 1) > 1) return false;
+  if (!r.updatedAt) return false;
+  return (Date.now() - new Date(r.updatedAt).getTime()) > 365 * DAY;
+}
+
+// Dormant important contact: importance >= 2 AND contact AND > 90 days since updatedAt
+function isDormantImportant(r) {
+  if (r.type !== 'contact') return false;
+  if ((r.importance || 1) < 2) return false;
+  if (isArchived(r)) return false;
+  if (!r.updatedAt) return false;
+  return (Date.now() - new Date(r.updatedAt).getTime()) > 90 * DAY;
+}
+
+// Recently added (within 30 days)
+function isRecentlyAdded(r) {
+  if (!r.createdAt) return false;
+  if (isArchived(r)) return false;
+  return (Date.now() - new Date(r.createdAt).getTime()) <= 30 * DAY;
+}
+
+// Incomplete contact: missing company or any contact method
+function isIncomplete(r) {
+  if (r.type !== 'contact') return false;
+  if (isArchived(r)) return false;
+  const hasCompany = !!(r.company && r.company.trim());
+  const hasContact = !!((r.phone && r.phone.trim()) || (r.email && r.email.trim()) || (r.line && r.line.trim()));
+  return !hasCompany || !hasContact;
+}
+
+function togglePin(id) {
+  const r = getById(id);
+  if (!r) return false;
+  updateRecord(id, { pinned: !r.pinned });
+  return !r.pinned; // new state
+}
+
+// Aggregate by company / venue, excluding archived
+function aggregateBy(field) {
+  const map = new Map();
+  getAll().forEach(r => {
+    if (isArchived(r)) return;
+    const k = (r[field] || '').trim();
+    if (!k) return;
+    if (!map.has(k)) map.set(k, []);
+    map.get(k).push(r);
+  });
+  return map; // Map<string, Record[]>
+}
+
+// ══════════════════════════════════════════════════════════════
+// NAVIGATION (view-based routing)
+// ══════════════════════════════════════════════════════════════
+let currentView = { type: 'browse' };
+let currentFilter = 'all';
+let currentSort = 'recent'; // recent | important | name
+let currentImpFilter = 0;   // 0 = any, 2 = >=2, 3 = =3
+let editingId = null;
+let compactMode = localStorage.getItem('knowledgehub_compact') === '1';
+let renderLimit = 100;       // pagination cap per list
+let renderLimitOverride = null; // when user clicks "show more"
+
+const PRIMARY_NAVS = {
+  browse:   () => ({ type: 'browse' }),
+  contacts: () => ({ type: 'list', recType: 'contact' }),
+  dm:       () => ({ type: 'list', recType: 'dm' }),
+  notes:    () => ({ type: 'list', recType: 'note' }),
+  search:   () => ({ type: 'search' }),
+};
+
+function showView(view) {
+  currentView = view;
+  currentFilter = 'all';
+  renderLimitOverride = null;
+  // Bottom nav active state
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  const navEl = document.getElementById('nav-' + page);
-  if (navEl) navEl.classList.add('active');
+  let navId = null;
+  if (view.type === 'browse') navId = 'nav-browse';
+  else if (view.type === 'search') navId = 'nav-search';
+  else if (view.type === 'list') {
+    if (view.recType === 'contact') navId = 'nav-contacts';
+    else if (view.recType === 'dm') navId = 'nav-dm';
+    else if (view.recType === 'note') navId = 'nav-notes';
+  }
+  if (navId) document.getElementById(navId).classList.add('active');
+  // FAB visibility
   const fab = document.getElementById('fab');
-  fab.style.display = (page === 'search') ? 'none' : 'flex';
+  fab.style.display = (view.type === 'search') ? 'none' : 'flex';
+  // Scroll main back to top
+  const main = document.getElementById('mainContent');
+  if (main) main.scrollTop = 0;
+  render();
+}
+
+// Backward-compat for bottom nav onclicks
+function showPage(name) {
+  const factory = PRIMARY_NAVS[name];
+  if (factory) showView(factory());
+}
+
+function openCompany(name) { showView({ type: 'group', kind: 'company', value: name }); }
+function openVenue(name) { showView({ type: 'group', kind: 'venue', value: name }); }
+function openSmart(filter) { showView({ type: 'smart', filter }); }
+function openCompanyList() { closeModal('menuModal'); showView({ type: 'group-list', kind: 'company' }); }
+function openVenueList() { closeModal('menuModal'); showView({ type: 'group-list', kind: 'venue' }); }
+function goBack() { showView({ type: 'browse' }); }
+
+function toggleCompact() {
+  compactMode = !compactMode;
+  localStorage.setItem('knowledgehub_compact', compactMode ? '1' : '0');
+  render();
+}
+
+function loadMore() {
+  renderLimitOverride = (renderLimitOverride || renderLimit) + renderLimit;
   render();
 }
 
 function updateStats() {
   const all = getAll();
-  document.getElementById('topStats').textContent = all.length + ' 筆資料';
+  document.getElementById('topStats').textContent = all.length + ' 筆';
+  // Backup warning
+  const badge = document.getElementById('storageBadge');
+  const lastBackup = localStorage.getItem(BACKUP_KEY);
+  if (all.length >= 5) {
+    if (!lastBackup) {
+      badge.textContent = '建議備份';
+      badge.classList.add('warn');
+    } else {
+      const days = Math.floor((Date.now() - parseInt(lastBackup)) / 86400000);
+      if (days > BACKUP_WARN_DAYS) {
+        badge.textContent = `已 ${days}天未備份`;
+        badge.classList.add('warn');
+      } else {
+        badge.textContent = '本機模式';
+        badge.classList.remove('warn');
+      }
+    }
+  } else {
+    badge.textContent = '本機模式';
+    badge.classList.remove('warn');
+  }
 }
 
-// ══════════════════════════════════════
-// RENDER
-// ══════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+// RENDER ROUTER
+// ══════════════════════════════════════════════════════════════
 function render() {
   const mc = document.getElementById('mainContent');
-  if (currentPage === 'browse') mc.innerHTML = renderBrowse();
-  else if (currentPage === 'contacts') mc.innerHTML = renderList('contact');
-  else if (currentPage === 'dm') mc.innerHTML = renderList('dm');
-  else if (currentPage === 'notes') mc.innerHTML = renderList('note');
-  else if (currentPage === 'search') mc.innerHTML = renderSearch();
+  const v = currentView;
+  if (v.type === 'browse') mc.innerHTML = renderBrowse();
+  else if (v.type === 'list') mc.innerHTML = renderList(v.recType);
+  else if (v.type === 'search') mc.innerHTML = renderSearch();
+  else if (v.type === 'group') mc.innerHTML = renderGroupView(v.kind, v.value);
+  else if (v.type === 'group-list') mc.innerHTML = renderGroupList(v.kind);
+  else if (v.type === 'smart') mc.innerHTML = renderSmartView(v.filter);
 }
 
 function renderBrowse() {
-  const all = getAll();
-  const contacts = all.filter(r => r.type === 'contact').length;
-  const dms = all.filter(r => r.type === 'dm').length;
-  const notes = all.filter(r => r.type === 'note').length;
+  const allRecs = getAll();
+  const live = allRecs.filter(r => !isArchived(r));
+  const contacts = live.filter(r => r.type === 'contact').length;
+  const dms = live.filter(r => r.type === 'dm').length;
+  const notes = live.filter(r => r.type === 'note' || r.type === 'lecture').length;
+  const highImp = live.filter(r => r.importance === 3).length;
 
   let html = `
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-num">${contacts}</div><div class="stat-label">人脈名片</div></div>
     <div class="stat-card"><div class="stat-num">${dms}</div><div class="stat-label">展場 DM</div></div>
     <div class="stat-card"><div class="stat-num">${notes}</div><div class="stat-label">知識筆記</div></div>
-    <div class="stat-card"><div class="stat-num">${all.filter(r=>r.importance===3).length}</div><div class="stat-label">高重要度</div></div>
+    <div class="stat-card"><div class="stat-num">${highImp}</div><div class="stat-label">高重要度</div></div>
   </div>`;
 
-  if (all.length === 0) {
+  if (allRecs.length === 0) {
     html += `<div class="empty"><div class="empty-icon">🗂️</div><div class="empty-text">還沒有任何資料<br>點右下角 + 開始新增</div></div>`;
     return html;
   }
 
-  html += `<div class="section-label">最近新增</div>`;
-  html += all.slice(0, 20).map(r => renderCard(r)).join('');
+  // 📌 釘選 section
+  const pinned = live.filter(r => r.pinned).sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
+  if (pinned.length > 0) {
+    html += `<div class="section-label" style="color:var(--amber)">📌 釘選 (${pinned.length})
+      <span class="link" onclick="openSmart('pinned')">全部 →</span></div>`;
+    html += pinned.slice(0, 5).map(r => renderCard(r, { compact: true })).join('');
+  }
+
+  // ⏰ Follow-ups due
+  const fus = getFollowupsDue();
+  if (fus.length > 0) {
+    html += `<div class="section-label" style="color:var(--amber)">⏰ 待跟進 (${fus.length})</div>`;
+    html += fus.slice(0, 5).map(({ r, st }) => `
+      <div class="card compact" onclick="openDetail('${r.id}')" style="border-left:3px solid var(--${st.kind === 'overdue' ? 'red' : 'amber'})">
+        <div class="card-header">
+          <div class="avatar" style="background:${avatarBg(r.name||r.id)}">${initials(r.name || r.type)}</div>
+          <div class="card-meta">
+            <div class="card-name">${esc(r.name) || '（未命名）'}</div>
+            <div class="card-role">${esc([r.company, r.title].filter(Boolean).join(' · ')) || ''}</div>
+            <div class="card-date">
+              <span class="followup-badge ${st.kind === 'overdue' ? 'followup-overdue' : ''}">⏰ ${st.label}</span>
+            </div>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  // ✨ Smart Views row
+  const counts = {
+    recent: live.filter(isRecentlyAdded).length,
+    dormant: live.filter(isDormantImportant).length,
+    incomplete: live.filter(isIncomplete).length,
+    archived: allRecs.filter(isArchived).length,
+  };
+  const smartTiles = [];
+  smartTiles.push(`<div class="smart-tile" data-kind="recent" onclick="openSmart('recent')">
+    <div class="smart-tile-icon">✨</div>
+    <div class="smart-tile-body">
+      <div class="smart-tile-num">${counts.recent}</div>
+      <div class="smart-tile-label">近 30 天新加入</div>
+    </div></div>`);
+  if (counts.dormant > 0) {
+    smartTiles.push(`<div class="smart-tile" data-kind="dormant" onclick="openSmart('dormant')">
+      <div class="smart-tile-icon">💤</div>
+      <div class="smart-tile-body">
+        <div class="smart-tile-num">${counts.dormant}</div>
+        <div class="smart-tile-label">久未聯絡重要人脈</div>
+      </div></div>`);
+  }
+  if (counts.incomplete > 0) {
+    smartTiles.push(`<div class="smart-tile" data-kind="incomplete" onclick="openSmart('incomplete')">
+      <div class="smart-tile-icon">⚠️</div>
+      <div class="smart-tile-body">
+        <div class="smart-tile-num">${counts.incomplete}</div>
+        <div class="smart-tile-label">缺資料的名片</div>
+      </div></div>`);
+  }
+  // Always show company/venue overview tiles
+  const companies = aggregateBy('company');
+  const venues = aggregateBy('venue');
+  smartTiles.push(`<div class="smart-tile" data-kind="company" onclick="openCompanyList()">
+    <div class="smart-tile-icon">🏢</div>
+    <div class="smart-tile-body">
+      <div class="smart-tile-num">${companies.size}</div>
+      <div class="smart-tile-label">公司一覽</div>
+    </div></div>`);
+  smartTiles.push(`<div class="smart-tile" data-kind="venue" onclick="openVenueList()">
+    <div class="smart-tile-icon">📍</div>
+    <div class="smart-tile-body">
+      <div class="smart-tile-num">${venues.size}</div>
+      <div class="smart-tile-label">場合一覽</div>
+    </div></div>`);
+  if (counts.archived > 0) {
+    smartTiles.push(`<div class="smart-tile" data-kind="archived" onclick="openSmart('archived')">
+      <div class="smart-tile-icon">📦</div>
+      <div class="smart-tile-body">
+        <div class="smart-tile-num">${counts.archived}</div>
+        <div class="smart-tile-label">歸檔</div>
+      </div></div>`);
+  }
+  html += `<div class="section-label">✨ 智慧視圖</div>`;
+  html += `<div class="smart-row">${smartTiles.join('')}</div>`;
+
+  // Tag cloud
+  const tags = getAllTags();
+  if (tags.length > 0) {
+    html += `<div class="section-label">熱門標籤</div>`;
+    html += `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px">${
+      tags.slice(0, 12).map(([t, c]) =>
+        `<span class="user-tag" onclick="searchByTag('${esc(t)}')">${esc(t)} <span style="opacity:.5">${c}</span></span>`
+      ).join('')
+    }</div>`;
+  }
+
+  // Category distribution
+  const catCounts = {};
+  live.forEach(r => { catCounts[r.category || '其他'] = (catCounts[r.category || '其他'] || 0) + 1; });
+  const topCats = Object.entries(catCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const maxCat = topCats[0]?.[1] || 1;
+  if (topCats.length > 0) {
+    html += `<div class="section-label">資料分布 <span style="text-transform:none;letter-spacing:0;color:var(--text3)">前 ${topCats.length} 大分類</span></div>`;
+    html += `<div class="card" style="padding:10px 14px">${
+      topCats.map(([c, n]) => `
+        <div class="stat-bar-row" onclick="filterByCategory('${esc(c)}')">
+          <div class="stat-bar-label">${catIcon(c)} ${esc(c)}</div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${(n/maxCat*100).toFixed(0)}%"></div></div>
+          <div class="stat-bar-num">${n}</div>
+        </div>`).join('')
+    }</div>`;
+  }
+
+  // Recent additions (capped, excludes archived)
+  const recent = live.slice(0, 20);
+  html += `<div class="section-label">最近新增 <span style="text-transform:none;letter-spacing:0">${renderCompactToggleInline()}</span></div>`;
+  html += recent.map(r => renderCard(r, { compact: compactMode })).join('');
   return html;
 }
 
+function renderCompactToggleInline() {
+  return `<button class="view-toggle ${compactMode ? 'active' : ''}" onclick="toggleCompact()" title="切換顯示模式">
+    ${compactMode ? '☰ 緊湊' : '▤ 卡片'}
+  </button>`;
+}
+
+function filterByCategory(cat) {
+  // Determine which page to jump to: find a type that has this category most
+  const all = getAll().filter(r => r.category === cat);
+  if (all.length === 0) return;
+  const typeCounts = {};
+  all.forEach(r => { typeCounts[r.type] = (typeCounts[r.type] || 0) + 1; });
+  const topType = Object.entries(typeCounts).sort((a,b)=>b[1]-a[1])[0][0];
+  const page = topType === 'contact' ? 'contacts' : topType === 'dm' ? 'dm' : 'notes';
+  showPage(page);
+  setTimeout(() => { setFilter(cat); }, 0);
+}
+
+function searchByTag(tag) {
+  showPage('search');
+  setTimeout(() => {
+    const inp = document.getElementById('searchInput');
+    if (inp) { inp.value = '#' + tag; doSearch(inp.value); }
+  }, 50);
+}
+
 function renderList(type) {
-  const filtered = getAll().filter(r => r.type === type);
+  // Knowledge tab unifies notes and lectures
+  const matchType = (type === 'note')
+    ? (r => r.type === 'note' || r.type === 'lecture')
+    : (r => r.type === type);
+  let filtered = getAll().filter(r => matchType(r) && !isArchived(r));
   if (filtered.length === 0) {
-    return `<div class="empty"><div class="empty-icon">${TYPE_MAP[type].icon}</div><div class="empty-text">還沒有${TYPE_MAP[type].label}資料<br>點右下角 + 新增</div></div>`;
+    const emptyLabel = type === 'note' ? '知識 / 上課' : TYPE_MAP[type].label;
+    const emptyIcon = type === 'note' ? '📝' : TYPE_MAP[type].icon;
+    return `<div class="empty"><div class="empty-icon">${emptyIcon}</div><div class="empty-text">還沒有${emptyLabel}資料<br>點右下角 + 新增</div></div>`;
   }
-  const cats = [...new Set(filtered.map(r => r.category))];
+  const cats = [...new Set(filtered.map(r => r.category))].filter(Boolean);
+  // Filter row
   let html = `<div class="filter-row">
     <button class="filter-btn ${currentFilter==='all'?'active':''}" onclick="setFilter('all')">全部 (${filtered.length})</button>
-    ${cats.map(c=>`<button class="filter-btn ${currentFilter===c?'active':''}" onclick="setFilter('${c}')">${c}</button>`).join('')}
+    ${cats.map(c=>{
+      const n = filtered.filter(r => r.category === c).length;
+      return `<button class="filter-btn ${currentFilter===c?'active':''}" onclick="setFilter('${esc(c)}')">${esc(c)} ${n}</button>`;
+    }).join('')}
   </div>`;
-  const show = currentFilter === 'all' ? filtered : filtered.filter(r => r.category === currentFilter);
-  html += show.map(r => renderCard(r)).join('');
+  // Sort/imp bar (with compact toggle)
+  html += `<div class="sort-bar">
+    <span>排序</span>
+    <select onchange="setSort(this.value)">
+      <option value="recent" ${currentSort==='recent'?'selected':''}>最新</option>
+      <option value="important" ${currentSort==='important'?'selected':''}>最重要</option>
+      <option value="name" ${currentSort==='name'?'selected':''}>名稱</option>
+    </select>
+    <span>重要度</span>
+    <select onchange="setImpFilter(parseInt(this.value))">
+      <option value="0" ${currentImpFilter===0?'selected':''}>全部</option>
+      <option value="2" ${currentImpFilter===2?'selected':''}>≥ 重要</option>
+      <option value="3" ${currentImpFilter===3?'selected':''}>僅必用</option>
+    </select>
+    <span style="flex:1"></span>
+    ${renderCompactToggleInline()}
+  </div>`;
+  // Apply filters
+  let show = currentFilter === 'all' ? filtered : filtered.filter(r => r.category === currentFilter);
+  if (currentImpFilter > 0) show = show.filter(r => (r.importance || 1) >= currentImpFilter);
+  // Apply sort
+  show = sortRecords(show, currentSort);
+  if (show.length === 0) {
+    html += `<div class="empty"><div class="empty-icon">∅</div><div class="empty-text">沒有符合條件的資料</div></div>`;
+  } else {
+    const limit = renderLimitOverride || renderLimit;
+    const visible = show.slice(0, limit);
+    html += visible.map(r => renderCard(r, { compact: compactMode })).join('');
+    if (show.length > limit) {
+      html += `<button class="show-more" onclick="loadMore()">顯示更多（還有 ${show.length - limit} 筆）</button>`;
+    }
+  }
   return html;
 }
+
+function sortRecords(arr, mode) {
+  const a = [...arr];
+  if (mode === 'important') {
+    return a.sort((x, y) => (y.importance || 1) - (x.importance || 1)
+      || (new Date(y.createdAt) - new Date(x.createdAt)));
+  }
+  if (mode === 'name') {
+    return a.sort((x, y) => (x.name || '').localeCompare(y.name || '', 'zh-Hant'));
+  }
+  return a.sort((x, y) => new Date(y.createdAt) - new Date(x.createdAt));
+}
+
+function setFilter(f) { currentFilter = f; render(); }
+function setSort(s) { currentSort = s; render(); }
+function setImpFilter(n) { currentImpFilter = n; render(); }
 
 function renderSearch() {
   return `
   <div class="search-wrap">
     <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input class="search-input" id="searchInput" placeholder="搜尋名字、公司、關鍵字…" oninput="doSearch(this.value)" autofocus>
+    <input class="search-input" id="searchInput" placeholder="搜尋名字、公司、關鍵字、#標籤…" oninput="doSearch(this.value)" autofocus>
+  </div>
+  <div style="margin-bottom:14px;font-size:11px;color:var(--text3);font-family:var(--mono)">
+    💡 提示：用 #標籤 直接搜尋標籤；多個關鍵字以空格分隔（OR 搜尋）
   </div>
   <div id="searchResults"><div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">輸入關鍵字搜尋</div></div></div>`;
 }
@@ -596,95 +1635,286 @@ function renderSearch() {
 function doSearch(q) {
   const res = document.getElementById('searchResults');
   if (!q.trim()) { res.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">輸入關鍵字搜尋</div></div>`; return; }
-  const ql = q.toLowerCase();
-  const matches = getAll().filter(r =>
-    (r.name||'').toLowerCase().includes(ql) ||
-    (r.company||'').toLowerCase().includes(ql) ||
-    (r.title||'').toLowerCase().includes(ql) ||
-    (r.category||'').toLowerCase().includes(ql) ||
-    (r.note||'').toLowerCase().includes(ql) ||
-    (r.keywords||'').toLowerCase().includes(ql) ||
-    (r.content||'').toLowerCase().includes(ql) ||
-    (r.venue||'').toLowerCase().includes(ql)
-  );
-  if (matches.length === 0) {
-    res.innerHTML = `<div class="empty"><div class="empty-icon">😶</div><div class="empty-text">找不到「${q}」相關資料</div></div>`;
+  // Handle #tag search separately
+  if (q.trim().startsWith('#')) {
+    const tag = q.trim().slice(1).toLowerCase();
+    const matches = getAll().filter(r => (r.tags || []).some(t => t.toLowerCase().includes(tag)));
+    if (matches.length === 0) {
+      res.innerHTML = `<div class="empty"><div class="empty-icon">😶</div><div class="empty-text">沒有 #${esc(tag)} 標籤的資料</div></div>`;
+      return;
+    }
+    res.innerHTML = `<div class="section-label">標籤 #${esc(tag)} · ${matches.length} 筆</div>` + matches.map(r => renderCard(r)).join('');
     return;
   }
-  res.innerHTML = `<div class="section-label">找到 ${matches.length} 筆結果</div>` + matches.map(r => renderCard(r)).join('');
+  const matches = searchScored(q);
+  if (matches.length === 0) {
+    res.innerHTML = `<div class="empty"><div class="empty-icon">😶</div><div class="empty-text">找不到「${esc(q)}」相關資料</div></div>`;
+    return;
+  }
+  res.innerHTML = `<div class="section-label">找到 ${matches.length} 筆結果 <span style="text-transform:none;letter-spacing:0;color:var(--text3)">依相關度排序</span></div>` +
+    matches.map(r => renderCard(r, { matched: r._matched })).join('');
 }
 
-function setFilter(f) {
-  currentFilter = f;
-  render();
+// ══════════════════════════════════════════════════════════════
+// CARD RENDERING
+// ══════════════════════════════════════════════════════════════
+function highlight(text, matched) {
+  if (!text) return '';
+  if (!matched || matched.size === 0) return esc(text);
+  // Sort tokens by length desc to avoid sub-matching shorter ones
+  const tokens = [...matched].sort((a, b) => b.length - a.length);
+  let safe = esc(text);
+  tokens.forEach(tok => {
+    if (!tok || tok.length < 1) return;
+    const re = new RegExp(tok.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    safe = safe.replace(re, m => `<mark>${m}</mark>`);
+  });
+  return safe;
 }
 
-function renderCard(r) {
+function renderCard(r, opts) {
+  opts = opts || {};
+  const compact = !!opts.compact;
   const imp = IMP_MAP[r.importance || 1];
   const typeInfo = TYPE_MAP[r.type] || TYPE_MAP.note;
   const bg = avatarBg(r.name || r.id);
-  const related = findRelated(r).slice(0, 2);
+  const fu = followupStatus(r.followupAt);
+  const archived = isArchived(r);
 
   let subtitle = '';
   if (r.type === 'contact') subtitle = [r.company, r.title].filter(Boolean).join(' · ');
   else if (r.type === 'dm') subtitle = r.company || '';
+  else if (r.type === 'lecture') {
+    subtitle = r.speaker || (r.keypoints && r.keypoints[0]) || (r.summary ? r.summary.slice(0, 40) : '') || '';
+  }
   else subtitle = r.keywords || '';
 
-  return `<div class="card" onclick="openDetail('${r.id}')">
+  const matched = opts.matched;
+  const userTags = (r.tags || []).slice(0, 4);
+
+  // NOTE: findRelated() is intentionally NOT called here.
+  // It was O(n²) — for 1000 records, that's 1M operations per render.
+  // Related resources are now shown only in detail view (lazy).
+
+  return `<div class="card${compact ? ' compact' : ''}${archived ? '' : ''}" onclick="openDetail('${r.id}')">
+    <button class="pin-btn ${r.pinned ? 'pinned' : ''}"
+            onclick="event.stopPropagation();togglePinCard('${r.id}')"
+            title="${r.pinned ? '取消釘選' : '釘選'}">${r.pinned ? '★' : '☆'}</button>
     <div class="card-header">
       <div class="avatar ${typeInfo.cls}" style="background:${bg}">${initials(r.name || r.type)}</div>
       <div class="card-meta">
-        <div class="card-name">${r.name || '（未命名）'}</div>
-        ${subtitle ? `<div class="card-role">${subtitle}</div>` : ''}
-        <div class="card-date"><span class="imp-dot ${imp.cls}"></span>${imp.label} · ${r.venue||''} ${formatDate(r.createdAt)}</div>
+        <div class="card-name">${highlight(r.name || '（未命名）', matched)}${archived ? '<span class="archive-badge">📦 歸檔</span>' : ''}</div>
+        ${subtitle ? `<div class="card-role">${highlight(subtitle, matched)}</div>` : ''}
+        <div class="card-date">
+          <span><span class="imp-dot ${imp.cls}"></span>${imp.label}</span>
+          ${r.venue ? `<span>· ${highlight(r.venue, matched)}</span>` : ''}
+          <span>· ${formatDate(r.createdAt)}</span>
+          ${fu && (fu.kind === 'overdue' || fu.kind === 'today' || fu.kind === 'soon')
+            ? `<span class="followup-badge ${fu.kind === 'overdue' ? 'followup-overdue' : ''}">⏰ ${fu.label}</span>` : ''}
+        </div>
       </div>
-      <span class="tag" style="margin-left:auto;flex-shrink:0" class="${catColor(r.category)}">${catIcon(r.category)}</span>
     </div>
+    ${compact ? '' : `
     <div class="tags">
-      <span class="tag ${catColor(r.category)}">${r.category || '其他'}</span>
-      <span class="tag" style="background:rgba(255,255,255,0.05);color:var(--text3)">${typeInfo.label}</span>
+      <span class="tag ${catColor(r.category)}">${catIcon(r.category)} ${esc(r.category || '其他')}</span>
+      <span class="tag" style="background:var(--surface2);color:var(--text3)">${typeInfo.label}</span>
+      ${userTags.map(t => `<span class="user-tag" onclick="event.stopPropagation();searchByTag('${esc(t)}')">${esc(t)}</span>`).join('')}
+      ${(r.tags || []).length > 4 ? `<span class="user-tag" style="opacity:.6">+${(r.tags || []).length - 4}</span>` : ''}
     </div>
-    ${r.note ? `<div class="card-note">${r.note.slice(0, 80)}${r.note.length > 80 ? '…' : ''}</div>` : ''}
-    ${related.length > 0 ? `
-    <div class="related-section">
-      <div class="related-label">✦ 相關資源</div>
-      ${related.map(rel => `<div class="related-item" onclick="event.stopPropagation();openDetail('${rel.id}')">
-        <span class="related-item-icon">${TYPE_MAP[rel.type]?.icon || '📌'}</span>
-        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rel.name || '（未命名）'}</span>
-        <span style="font-size:10px;color:var(--text3)">${rel._reason}</span>
-      </div>`).join('')}
-    </div>` : ''}
+    ${r.note ? `<div class="card-note">${highlight(r.note.slice(0, 100) + (r.note.length > 100 ? '…' : ''), matched)}</div>` : ''}
+    `}
   </div>`;
 }
 
-// ══════════════════════════════════════
-// CONTEXTUAL SUGGESTIONS
-// ══════════════════════════════════════
-function findRelated(record) {
-  const all = getAll().filter(r => r.id !== record.id);
-  const scored = all.map(r => {
-    let score = 0; let reason = '';
-    // Same venue
-    if (record.venue && r.venue && record.venue === r.venue) { score += 3; reason = '同場合'; }
-    // Same company
-    if (record.company && r.company && record.company === r.company) { score += 2; if (!reason) reason = '同公司'; }
-    // Same category
-    if (record.category && r.category && record.category === r.category) { score += 1; if (!reason) reason = '同類別'; }
-    // Keyword overlap
-    const kw1 = ((record.keywords || '') + ' ' + (record.note || '') + ' ' + (record.name || '')).toLowerCase();
-    const kw2 = ((r.keywords || '') + ' ' + (r.note || '') + ' ' + (r.name || '')).toLowerCase();
-    const words1 = kw1.split(/[\s,，、]+/).filter(w => w.length > 1);
-    const words2 = kw2.split(/[\s,，、]+/).filter(w => w.length > 1);
-    const overlap = words1.filter(w => words2.includes(w));
-    if (overlap.length > 0) { score += overlap.length; if (!reason) reason = '主題相關'; }
-    return { ...r, _score: score, _reason: reason };
-  });
-  return scored.filter(r => r._score > 0).sort((a, b) => b._score - a._score);
+function togglePinCard(id) {
+  const newState = togglePin(id);
+  showToast(newState ? '✓ 已釘選' : '已取消釘選');
+  render();
 }
 
-// ══════════════════════════════════════
+// Simple HTML escape
+function esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ══════════════════════════════════════════════════════════════
+// GROUP VIEWS (Company / Venue aggregation)
+// ══════════════════════════════════════════════════════════════
+function renderGroupView(kind, value) {
+  const field = kind === 'company' ? 'company' : 'venue';
+  const icon = kind === 'company' ? '🏢' : '📍';
+  const label = kind === 'company' ? '公司' : '場合';
+  const all = getAll().filter(r => (r[field] || '').trim() === value && !isArchived(r));
+  const counts = {
+    contact: all.filter(r => r.type === 'contact').length,
+    dm: all.filter(r => r.type === 'dm').length,
+    note: all.filter(r => r.type === 'note').length,
+    lecture: all.filter(r => r.type === 'lecture').length,
+  };
+
+  let html = `<div class="view-header">
+    <button class="back-btn" onclick="goBack()">← 返回</button>
+    <div style="flex:1;min-width:0">
+      <div class="view-title">${icon} ${esc(value)}</div>
+      <div class="view-subtitle">${label}視圖</div>
+    </div>
+    ${renderCompactToggleInline()}
+  </div>`;
+
+  if (all.length === 0) {
+    html += `<div class="empty"><div class="empty-icon">${icon}</div><div class="empty-text">這個${label}沒有資料</div></div>`;
+    return html;
+  }
+
+  html += `<div class="group-summary">
+    <div class="group-summary-icon">${icon}</div>
+    <div class="group-summary-body">
+      <div class="group-summary-name">${esc(value)}</div>
+      <div class="group-summary-stats">${all.length} 筆 · ${counts.contact} 名片 · ${counts.dm} DM · ${counts.note} 筆記${counts.lecture ? ` · ${counts.lecture} 上課` : ''}</div>
+    </div>
+  </div>`;
+
+  // Type filter
+  const types = ['all', 'contact', 'dm', 'note', 'lecture'].filter(t => t === 'all' || counts[t] > 0);
+  html += `<div class="filter-row">
+    ${types.map(t => `<button class="filter-btn ${currentFilter === t ? 'active' : ''}" onclick="setFilter('${t}')">
+      ${t === 'all' ? `全部 (${all.length})` : `${TYPE_MAP[t].icon} ${TYPE_MAP[t].label} ${counts[t]}`}
+    </button>`).join('')}
+  </div>`;
+
+  let show = currentFilter === 'all' ? all : all.filter(r => r.type === currentFilter);
+  show = sortRecords(show, currentSort);
+  html += show.map(r => renderCard(r, { compact: compactMode })).join('');
+  return html;
+}
+
+function renderGroupList(kind) {
+  const field = kind === 'company' ? 'company' : 'venue';
+  const icon = kind === 'company' ? '🏢' : '📍';
+  const label = kind === 'company' ? '公司' : '場合';
+  const groups = aggregateBy(field);
+  if (groups.size === 0) {
+    return `<div class="view-header">
+      <button class="back-btn" onclick="goBack()">← 返回</button>
+      <div class="view-title">${icon} ${label}一覽</div>
+    </div>
+    <div class="empty"><div class="empty-icon">${icon}</div><div class="empty-text">還沒有資料</div></div>`;
+  }
+  const entries = [...groups.entries()].sort((a, b) => b[1].length - a[1].length);
+
+  let html = `<div class="view-header">
+    <button class="back-btn" onclick="goBack()">← 返回</button>
+    <div style="flex:1;min-width:0">
+      <div class="view-title">${icon} ${label}一覽</div>
+      <div class="view-subtitle">${entries.length} 個${label}</div>
+    </div>
+  </div>`;
+
+  // Simple search-as-you-type
+  html += `<div class="search-wrap">
+    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="search-input" id="groupSearchInput" placeholder="篩選${label}…" oninput="filterGroupList(this.value)">
+  </div>
+  <div id="groupListBody">${renderGroupListItems(entries, kind)}</div>`;
+  return html;
+}
+
+function renderGroupListItems(entries, kind) {
+  return entries.map(([name, records]) => {
+    const counts = {
+      contact: records.filter(r => r.type === 'contact').length,
+      dm: records.filter(r => r.type === 'dm').length,
+      note: records.filter(r => r.type === 'note').length,
+      lecture: records.filter(r => r.type === 'lecture').length,
+    };
+    const pills = [];
+    if (counts.contact) pills.push(`<span class="type-pill type-contact">${TYPE_MAP.contact.icon} ${counts.contact}</span>`);
+    if (counts.dm) pills.push(`<span class="type-pill type-dm">${TYPE_MAP.dm.icon} ${counts.dm}</span>`);
+    if (counts.note) pills.push(`<span class="type-pill type-note">${TYPE_MAP.note.icon} ${counts.note}</span>`);
+    if (counts.lecture) pills.push(`<span class="type-pill type-lecture">${TYPE_MAP.lecture.icon} ${counts.lecture}</span>`);
+    const hi = records.filter(r => r.importance === 3).length;
+    const meta = hi > 0 ? `${hi} 筆必用 · 最後更新 ${formatDate(records[0].updatedAt || records[0].createdAt)}`
+                       : `最後更新 ${formatDate(records[0].updatedAt || records[0].createdAt)}`;
+    const handler = kind === 'company' ? `openCompany('${esc(name)}')` : `openVenue('${esc(name)}')`;
+    return `<div class="group-item" onclick="${handler}">
+      <div class="group-item-icon">${kind === 'company' ? '🏢' : '📍'}</div>
+      <div class="group-item-body">
+        <div class="group-item-name">${esc(name)}</div>
+        <div class="group-item-meta">${meta}</div>
+        <div class="group-item-pills">${pills.join('')}</div>
+      </div>
+      <div class="group-item-count">${records.length}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterGroupList(q) {
+  const v = currentView;
+  if (!v || v.type !== 'group-list') return;
+  const field = v.kind === 'company' ? 'company' : 'venue';
+  const groups = aggregateBy(field);
+  let entries = [...groups.entries()];
+  if (q && q.trim()) {
+    const ql = q.toLowerCase();
+    entries = entries.filter(([k]) => k.toLowerCase().includes(ql));
+  }
+  entries.sort((a, b) => b[1].length - a[1].length);
+  const body = document.getElementById('groupListBody');
+  if (body) body.innerHTML = renderGroupListItems(entries, v.kind);
+}
+
+// ══════════════════════════════════════════════════════════════
+// SMART VIEWS
+// ══════════════════════════════════════════════════════════════
+function renderSmartView(filter) {
+  const presets = {
+    pinned:     { title: '📌 釘選',           subtitle: '手動標記的核心資料',                  predicate: r => r.pinned },
+    recent:     { title: '✨ 近 30 天新加入',  subtitle: '最近一個月內新增',                    predicate: isRecentlyAdded },
+    dormant:    { title: '💤 久未聯絡的重要人脈', subtitle: '重要度 ≥ 重要、超過 90 天沒更新',  predicate: isDormantImportant },
+    incomplete: { title: '⚠️ 缺資料的名片',    subtitle: '聯絡人少了公司或聯絡方式',             predicate: isIncomplete },
+    archived:   { title: '📦 歸檔',           subtitle: '備用且超過 12 個月沒更新（搜尋仍找得到）', predicate: isArchived },
+  };
+  const cfg = presets[filter];
+  if (!cfg) return `<div class="empty">未知的視圖</div>`;
+  let records = getAll().filter(cfg.predicate);
+  records = sortRecords(records, filter === 'dormant' ? 'recent' : currentSort);
+
+  let html = `<div class="view-header">
+    <button class="back-btn" onclick="goBack()">← 返回</button>
+    <div style="flex:1;min-width:0">
+      <div class="view-title">${cfg.title}</div>
+      <div class="view-subtitle">${cfg.subtitle}</div>
+    </div>
+    ${renderCompactToggleInline()}
+  </div>`;
+
+  if (records.length === 0) {
+    let emptyMsg = '沒有符合的資料';
+    if (filter === 'pinned') emptyMsg = '尚未釘選任何資料<br>在卡片右上角點 ☆ 即可釘選';
+    else if (filter === 'archived') emptyMsg = '沒有歸檔資料';
+    else if (filter === 'dormant') emptyMsg = '所有重要人脈都在 90 天內有更新 ✓';
+    else if (filter === 'incomplete') emptyMsg = '所有名片資料都完整 ✓';
+    html += `<div class="empty"><div class="empty-icon">${cfg.title.split(' ')[0]}</div><div class="empty-text">${emptyMsg}</div></div>`;
+    return html;
+  }
+
+  // Summary header
+  html += `<div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:10px">${records.length} 筆</div>`;
+
+  // Pagination
+  const limit = renderLimitOverride || renderLimit;
+  const visible = records.slice(0, limit);
+  html += visible.map(r => renderCard(r, { compact: compactMode })).join('');
+  if (records.length > limit) {
+    html += `<button class="show-more" onclick="loadMore()">顯示更多（還有 ${records.length - limit} 筆）</button>`;
+  }
+  return html;
+}
+
+// ══════════════════════════════════════════════════════════════
 // DETAIL VIEW
-// ══════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 function openDetail(id) {
   const r = getById(id);
   if (!r) return;
@@ -692,90 +1922,221 @@ function openDetail(id) {
   const typeInfo = TYPE_MAP[r.type] || TYPE_MAP.note;
   const imp = IMP_MAP[r.importance || 1];
   const related = findRelated(r);
+  const linkedRecords = (r.linkedIds || []).map(getById).filter(Boolean);
 
   let fields = '';
+  const clickableCompany = c => `<span class="clickable-meta" onclick="closeModal('detailModal');setTimeout(()=>openCompany('${esc(c)}'),200)">${esc(c)}</span>`;
+  const clickableVenue = v => `<span class="clickable-meta" onclick="closeModal('detailModal');setTimeout(()=>openVenue('${esc(v)}'),200)">${esc(v)}</span>`;
   if (r.type === 'contact') {
-    if (r.company) fields += detailRow('🏢', '公司', r.company);
-    if (r.title) fields += detailRow('💼', '職稱', r.title);
-    if (r.phone) fields += detailRow('📞', '電話', r.phone);
-    if (r.email) fields += detailRow('✉️', 'Email', r.email);
-    if (r.line) fields += detailRow('💬', 'LINE', r.line);
+    if (r.company) fields += detailRow('🏢', '公司', clickableCompany(r.company));
+    if (r.title) fields += detailRow('💼', '職稱', esc(r.title));
+    if (r.phone) fields += detailRow('📞', '電話', `<a href="tel:${esc(r.phone)}" style="color:var(--accent);text-decoration:none">${esc(r.phone)}</a>`);
+    if (r.email) fields += detailRow('✉️', 'Email', `<a href="mailto:${esc(r.email)}" style="color:var(--accent);text-decoration:none">${esc(r.email)}</a>`);
+    if (r.line) fields += detailRow('💬', 'LINE', esc(r.line));
   } else if (r.type === 'dm') {
-    if (r.company) fields += detailRow('🏢', '來源', r.company);
-    if (r.keywords) fields += detailRow('🔑', '關鍵字', r.keywords);
+    if (r.company) fields += detailRow('🏢', '來源', clickableCompany(r.company));
+    if (r.keywords) fields += detailRow('🔑', '關鍵字', esc(r.keywords));
+  } else if (r.type === 'lecture') {
+    if (r.speaker) fields += detailRow('🎤', '講者', esc(r.speaker));
+    if (r.keywords) fields += detailRow('🔑', '關鍵字', esc(r.keywords));
+    if (r.transcript) fields += detailRow('📝', '逐字稿', `${r.transcript.length} 字`);
   } else {
-    if (r.keywords) fields += detailRow('🔑', '關鍵字', r.keywords);
+    if (r.keywords) fields += detailRow('🔑', '關鍵字', esc(r.keywords));
   }
-  if (r.venue) fields += detailRow('📍', '場合', r.venue);
-  if (r.category) fields += detailRow('🗂️', '分類', r.category);
+  if (r.venue) fields += detailRow('📍', '場合', clickableVenue(r.venue));
+  if (r.category) fields += detailRow('🗂️', '分類', `${catIcon(r.category)} ${esc(r.category)}`);
   fields += detailRow('⭐', '重要度', imp.label);
+  if (r.followupAt) {
+    const fu = followupStatus(r.followupAt);
+    fields += detailRow('⏰', '跟進日', `<span class="followup-badge ${fu.kind === 'overdue' ? 'followup-overdue' : ''}">${fu.label} (${formatDate(r.followupAt)})</span>`);
+  }
   fields += detailRow('📅', '新增時間', formatDateFull(r.createdAt));
 
-  let relatedHtml = '';
-  if (related.length > 0) {
-    relatedHtml = `<div class="section-label" style="margin-top:20px">✦ 情境聯想 (${related.length} 筆)</div>
-    ${related.slice(0, 5).map(rel => `<div class="card" onclick="openDetail('${rel.id}')" style="margin-bottom:8px">
-      <div style="display:flex;align-items:center;gap:8px">
-        <div class="avatar ${TYPE_MAP[rel.type]?.cls}" style="width:32px;height:32px;border-radius:8px;font-size:11px;background:${avatarBg(rel.name||rel.id)}">${initials(rel.name||rel.type)}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rel.name || '（未命名）'}</div>
-          <div style="font-size:11px;color:var(--text2)">${TYPE_MAP[rel.type]?.label} · ${rel._reason}</div>
-        </div>
+  // User tags
+  const tagsHtml = (r.tags && r.tags.length > 0) ? `
+    <div style="margin-top:14px">
+      <div class="section-label">標籤</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
+        ${r.tags.map(t => `<span class="user-tag" onclick="closeModal('detailModal');setTimeout(()=>searchByTag('${esc(t)}'),300)">${esc(t)}</span>`).join('')}
       </div>
-    </div>`).join('')}`;
+    </div>` : '';
+
+  // Explicit links
+  const linkedHtml = `
+    <div style="margin-top:18px">
+      <div class="section-label">
+        🔗 已連結 (${linkedRecords.length})
+        <span class="link" onclick="openPicker('${r.id}')">＋ 連結資料</span>
+      </div>
+      ${linkedRecords.length === 0
+        ? `<div style="font-size:11px;color:var(--text3);padding:8px 0">尚未手動連結其他資料</div>`
+        : linkedRecords.map(lr => `
+          <div class="rel-card">
+            <div class="avatar ${TYPE_MAP[lr.type]?.cls}" style="width:32px;height:32px;border-radius:8px;font-size:11px;background:${avatarBg(lr.name||lr.id)}">${initials(lr.name||lr.type)}</div>
+            <div class="rel-card-main" onclick="openDetail('${lr.id}')">
+              <div class="rel-card-name">${esc(lr.name || '（未命名）')}</div>
+              <div class="rel-card-sub">${TYPE_MAP[lr.type]?.label || ''} · ${esc(lr.category || '')}</div>
+            </div>
+            <button class="rel-unlink" onclick="unlinkAndRefresh('${r.id}','${lr.id}')" title="取消連結">×</button>
+          </div>`).join('')}
+    </div>`;
+
+  // Auto-related (filter out already-linked)
+  const linkedSet = new Set(r.linkedIds || []);
+  const autoRel = related.filter(x => !linkedSet.has(x.id)).slice(0, 6);
+  let relatedHtml = '';
+  if (autoRel.length > 0) {
+    relatedHtml = `<div style="margin-top:18px">
+      <div class="section-label">✦ 演算法推薦 (${autoRel.length})</div>
+      ${autoRel.map(rel => `<div class="card" style="margin-bottom:6px;padding:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="avatar ${TYPE_MAP[rel.type]?.cls}" style="width:32px;height:32px;border-radius:8px;font-size:11px;background:${avatarBg(rel.name||rel.id)}">${initials(rel.name||rel.type)}</div>
+          <div style="flex:1;min-width:0;cursor:pointer" onclick="openDetail('${rel.id}')">
+            <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(rel.name || '（未命名）')}</div>
+            <div class="reasons" style="margin-top:3px">
+              ${rel._reasons.slice(0, 3).map(rs => `<span class="reason-chip" data-k="${rs.k}">${esc(rs.t)}</span>`).join('')}
+            </div>
+          </div>
+          <button class="rel-unlink" onclick="linkAndRefresh('${r.id}','${rel.id}')" title="加入手動連結" style="font-size:18px;color:var(--accent)">＋</button>
+        </div>
+      </div>`).join('')}</div>`;
+  }
+
+  // Lecture-specific sections (summary, keypoints, actions, transcript collapsible)
+  let lectureHtml = '';
+  if (r.type === 'lecture') {
+    if (r.summary) {
+      lectureHtml += `<div style="margin-top:14px">
+        <div class="section-label">📋 摘要</div>
+        <div class="lecture-summary">${esc(r.summary).replace(/\n/g, '<br>')}</div>
+      </div>`;
+    }
+    if (r.keypoints && r.keypoints.length > 0) {
+      lectureHtml += `<div style="margin-top:14px">
+        <div class="section-label">💡 重點 (${r.keypoints.length})</div>
+        <ul class="kp-list">${r.keypoints.map(p => `<li>${esc(p)}</li>`).join('')}</ul>
+      </div>`;
+    }
+    if (r.actionItems && r.actionItems.length > 0) {
+      lectureHtml += `<div style="margin-top:14px">
+        <div class="section-label">✓ 行動項目 (${r.actionItems.length})</div>
+        <ul class="kp-list action-list">${r.actionItems.map(p => `<li>${esc(p)}</li>`).join('')}</ul>
+      </div>`;
+    }
+    if (r.transcript) {
+      const transId = 'transcript-' + r.id;
+      lectureHtml += `<div style="margin-top:14px">
+        <div class="section-label">📝 完整逐字稿 <button class="collapse-btn" onclick="toggleTranscript('${transId}')">展開 ▼</button></div>
+        <div class="transcript-box" id="${transId}" style="display:none">${esc(r.transcript)}</div>
+      </div>`;
+    }
   }
 
   document.getElementById('detailModalBody').innerHTML = `
     <div style="text-align:center;margin-bottom:16px">
       <div class="detail-avatar" style="background:${bg}">${initials(r.name || r.type)}</div>
-      <div class="detail-name">${r.name || '（未命名）'}</div>
-      <div class="detail-role">${typeInfo.label} · ${r.category || '其他'}</div>
+      <div class="detail-name">${esc(r.name || '（未命名）')}${r.pinned ? ' <span style="color:var(--amber)" title="已釘選">★</span>' : ''}${isArchived(r) ? ' <span class="archive-badge">📦 歸檔</span>' : ''}</div>
+      <div class="detail-role">${typeInfo.label} · ${esc(r.category || '其他')}</div>
     </div>
     ${fields}
-    ${r.note ? `<div style="margin-top:14px"><div class="section-label">備注 / 心得</div><div class="ocr-result" style="margin-top:6px">${r.note.replace(/\n/g,'<br>')}</div></div>` : ''}
-    ${r.ocrText ? `<div style="margin-top:14px"><div class="section-label">原始辨識文字</div><div class="ocr-result" style="margin-top:6px">${r.ocrText.replace(/\n/g,'<br>')}</div></div>` : ''}
+    ${tagsHtml}
+    ${lectureHtml}
+    ${r.note ? `<div style="margin-top:14px"><div class="section-label">備注 / 心得</div><div class="ocr-result" style="margin-top:6px">${esc(r.note).replace(/\n/g,'<br>')}</div></div>` : ''}
+    ${r.content ? `<div style="margin-top:14px"><div class="section-label">內容</div><div class="ocr-result" style="margin-top:6px;background:var(--surface2);color:var(--text);border-left-color:var(--green)">${esc(r.content).replace(/\n/g,'<br>')}</div></div>` : ''}
+    ${r.ocrText ? `<div style="margin-top:14px"><div class="section-label">原始辨識文字</div><div class="ocr-result" style="margin-top:6px">${esc(r.ocrText).replace(/\n/g,'<br>')}</div></div>` : ''}
+    ${linkedHtml}
     ${relatedHtml}
-    <div style="display:flex;gap:8px;margin-top:20px">
-      <button class="btn-secondary" onclick="editRecord('${r.id}')" style="width:50%;margin:0">✏️ 編輯</button>
-      <button class="btn-secondary" onclick="confirmDelete('${r.id}')" style="width:50%;margin:0;color:var(--red)">🗑️ 刪除</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:20px">
+      <button class="btn-secondary" onclick="togglePinFromDetail('${r.id}')" style="margin:0;color:${r.pinned ? 'var(--amber)' : 'var(--text2)'}">${r.pinned ? '★ 取消釘選' : '☆ 釘選'}</button>
+      <button class="btn-secondary" onclick="editRecord('${r.id}')" style="margin:0">✏️ 編輯</button>
+      <button class="btn-secondary" onclick="confirmDelete('${r.id}')" style="margin:0;color:var(--red)">🗑️ 刪除</button>
     </div>`;
   openModal('detailModal');
+}
+
+function toggleTranscript(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const btn = el.previousElementSibling?.querySelector('.collapse-btn');
+  if (el.style.display === 'none') {
+    el.style.display = 'block';
+    if (btn) btn.textContent = '收合 ▲';
+  } else {
+    el.style.display = 'none';
+    if (btn) btn.textContent = '展開 ▼';
+  }
+}
+
+function togglePinFromDetail(id) {
+  const newState = togglePin(id);
+  showToast(newState ? '✓ 已釘選' : '已取消釘選');
+  openDetail(id);
 }
 
 function detailRow(icon, label, val) {
   return `<div class="detail-row"><div class="detail-row-icon">${icon}</div><div class="detail-row-label">${label}</div><div class="detail-row-val">${val}</div></div>`;
 }
 
+function linkAndRefresh(idA, idB) {
+  linkRecords(idA, idB);
+  showToast('✓ 已連結');
+  openDetail(idA);
+}
+function unlinkAndRefresh(idA, idB) {
+  unlinkRecords(idA, idB);
+  showToast('已取消連結');
+  openDetail(idA);
+}
+
+let _lastDeleted = null;
 function confirmDelete(id) {
-  if (confirm('確定要刪除這筆資料？')) {
-    deleteRecord(id);
+  if (!confirm('確定要刪除這筆資料？\n刪除後 5 秒內可復原。')) return;
+  const removed = deleteRecord(id);
+  if (removed) {
+    _lastDeleted = removed;
     closeModal('detailModal');
     render();
-    showToast('已刪除');
+    showUndoBar('已刪除「' + (removed.name || '未命名') + '」');
   }
 }
 
-// ══════════════════════════════════════
-// ADD FORMS
-// ══════════════════════════════════════
+function undoLast() {
+  if (!_lastDeleted) return;
+  const db = loadDB();
+  db.unshift(_lastDeleted);
+  saveDB(db);
+  _lastDeleted = null;
+  hideUndoBar();
+  render();
+  showToast('✓ 已復原');
+}
+
+// ══════════════════════════════════════════════════════════════
+// ADD / EDIT FORM (unified with editingId state)
+// ══════════════════════════════════════════════════════════════
 function openAddModal() {
+  editingId = null;
   const types = [
     { type: 'contact', icon: '👤', label: '名片 / 聯絡人' },
     { type: 'dm', icon: '📄', label: '展場 DM / 型錄' },
     { type: 'note', icon: '📝', label: '知識 / 技能筆記' },
+    { type: 'lecture', icon: '🎓', label: '上課 / 講座筆記', sub: '上傳逐字稿 → AI 抓重點' },
   ];
   document.getElementById('addModalTitle').textContent = '選擇類型';
   document.getElementById('addModalBody').innerHTML = `
     ${types.map(t => `<div class="card" onclick="showAddForm('${t.type}')" style="display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:10px">
       <div style="font-size:28px">${t.icon}</div>
-      <div><div style="font-size:15px;font-weight:500">${t.label}</div></div>
+      <div style="flex:1"><div style="font-size:15px;font-weight:500">${t.label}</div>${t.sub ? `<div style="font-size:11px;color:var(--text2);margin-top:2px">${t.sub}</div>` : ''}</div>
       <svg style="margin-left:auto;opacity:.4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
     </div>`).join('')}`;
   openModal('addModal');
 }
 
+let _currentTags = [];
+
 function showAddForm(type) {
-  document.getElementById('addModalTitle').textContent = '新增' + TYPE_MAP[type].label;
+  const isEdit = !!editingId;
+  document.getElementById('addModalTitle').textContent = (isEdit ? '編輯' : '新增') + TYPE_MAP[type].label;
   CAT_MAP = getCAT_MAP();
   const groups = {};
   Object.entries(CAT_MAP).forEach(([name, info]) => {
@@ -784,7 +2145,7 @@ function showAddForm(type) {
     groups[g].push(name);
   });
   const catOptions = Object.entries(groups).map(([g, cats]) =>
-    `<optgroup label="── ${g} ──">${cats.map(c=>`<option value="${c}">${CAT_MAP[c].icon} ${c}</option>`).join('')}</optgroup>`
+    `<optgroup label="── ${g} ──">${cats.map(c=>`<option value="${esc(c)}">${CAT_MAP[c].icon} ${esc(c)}</option>`).join('')}</optgroup>`
   ).join('');
   const impStars = [1,2,3].map(i => `<button type="button" class="star-btn" data-imp="${i}" onclick="setImp(${i})">★</button>`).join('');
 
@@ -810,7 +2171,8 @@ function showAddForm(type) {
         <div class="form-group"><label class="form-label">電話</label><input class="form-input" id="f-phone" type="tel" placeholder="0912-345-678"></div>
       </div>
       <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="f-email" type="email" placeholder="chen@abc.com"></div>
-      <div class="form-group"><label class="form-label">LINE / 其他聯絡</label><input class="form-input" id="f-line" placeholder="@chenID"></div>`;
+      <div class="form-group"><label class="form-label">LINE / 其他聯絡</label><input class="form-input" id="f-line" placeholder="@chenID"></div>
+      <div class="form-group"><label class="form-label">下次跟進日（選填）</label><input class="form-input" id="f-followup" type="date"></div>`;
   } else if (type === 'dm') {
     typeFields = `
       <div class="form-group">
@@ -826,6 +2188,43 @@ function showAddForm(type) {
       <div class="form-group"><label class="form-label">標題 / 名稱 *</label><input class="form-input" id="f-name" placeholder="ABC 科技產品型錄 2024"></div>
       <div class="form-group"><label class="form-label">來源公司</label><input class="form-input" id="f-company" placeholder="ABC 科技"></div>
       <div class="form-group"><label class="form-label">關鍵字（逗號分隔）</label><input class="form-input" id="f-keywords" placeholder="行銷自動化, MarTech, SaaS"></div>`;
+  } else if (type === 'lecture') {
+    typeFields = `
+      <div class="form-group"><label class="form-label">課程 / 講座名稱 *</label><input class="form-input" id="f-name" placeholder="2024 美容展 趨勢論壇"></div>
+      <div class="form-group"><label class="form-label">講者（選填）</label><input class="form-input" id="f-speaker" placeholder="王老師 / 林教授"></div>
+
+      <div class="form-group">
+        <label class="form-label">逐字稿 <span style="color:var(--text3);font-family:var(--font);text-transform:none">（上傳檔案或直接貼上）</span></label>
+        <div class="upload-zone" onclick="document.getElementById('transcriptFileInput').click()">
+          <div class="upload-zone-icon">📄</div>
+          <div class="upload-zone-text">點此上傳逐字稿檔案</div>
+          <div class="upload-zone-sub">支援 .txt / .md / .srt / .vtt（字幕檔會自動移除時間碼）</div>
+        </div>
+        <input type="file" id="transcriptFileInput" accept=".txt,.md,.srt,.vtt,text/plain,text/markdown" onchange="handleTranscriptUpload(this)">
+        <div id="transcriptFileInfo"></div>
+        <textarea class="form-textarea" id="f-transcript" placeholder="或直接在這裡貼上逐字稿…" style="min-height:140px;margin-top:10px" oninput="updateTranscriptStats()"></textarea>
+        <div id="transcript-stats" style="font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono);text-align:right"></div>
+      </div>
+
+      <div class="form-group">
+        <button type="button" class="btn-secondary" id="ai-extract-btn" onclick="extractFromTranscript()" style="margin:0">🤖 用 AI 抓重點</button>
+        <div id="ai-result" style="margin-top:10px;display:none">
+          <div class="ai-section">
+            <div class="ai-label">📋 摘要 <span style="color:var(--text3);text-transform:none;letter-spacing:0">可手動修改</span></div>
+            <textarea class="form-textarea ai-input" id="f-summary" style="min-height:60px"></textarea>
+          </div>
+          <div class="ai-section">
+            <div class="ai-label">💡 重點 <span style="color:var(--text3);text-transform:none;letter-spacing:0">每行一條</span></div>
+            <textarea class="form-textarea ai-input" id="f-keypoints" style="min-height:100px"></textarea>
+          </div>
+          <div class="ai-section">
+            <div class="ai-label">✓ 行動項目 <span style="color:var(--text3);text-transform:none;letter-spacing:0">每行一條，可留空</span></div>
+            <textarea class="form-textarea ai-input" id="f-actions" style="min-height:60px"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group"><label class="form-label">關鍵字（逗號分隔，AI 會自動建議）</label><input class="form-input" id="f-keywords" placeholder="行銷, 趨勢, ROI"></div>`;
   } else {
     typeFields = `
       <div class="form-group"><label class="form-label">標題 *</label><input class="form-input" id="f-name" placeholder="行銷自動化工具比較"></div>
@@ -834,6 +2233,7 @@ function showAddForm(type) {
   }
 
   document.getElementById('addModalBody').innerHTML = `
+    <div id="dup-warn-host"></div>
     <div class="form-group"><label class="form-label" style="display:flex;align-items:center;justify-content:space-between">分類 *<span style="font-size:10px;color:var(--accent);cursor:pointer" onclick="openCatManager()">＋ 管理分類</span></label>
       <select class="form-select" id="f-category">${catOptions}</select>
     </div>
@@ -841,15 +2241,72 @@ function showAddForm(type) {
     <div class="form-group"><label class="form-label">認識場合 / 來源</label>
       <input class="form-input" id="f-venue" placeholder="2024 台北國際電腦展、研討會…">
     </div>
+    <div class="form-group">
+      <label class="form-label">標籤（按 Enter 或逗號新增）</label>
+      <div class="tag-input-wrap" id="tag-wrap" onclick="document.getElementById('tag-input').focus()">
+        <input id="tag-input" class="tag-input" placeholder="例：待跟進、2024展、潛力" oninput="renderTagSuggest()" onkeydown="onTagKey(event)">
+      </div>
+      <div class="tag-suggest-row" id="tag-suggest-row"></div>
+    </div>
     <div class="form-group"><label class="form-label">重要度</label>
       <div class="star-row">${impStars}</div>
     </div>
     <div class="form-group"><label class="form-label">備注 / 心得</label>
       <textarea class="form-textarea" id="f-note" placeholder="這個人的特別之處、DM 的重點、學到的東西…"></textarea>
     </div>
-    <button class="btn-primary" onclick="submitForm('${type}')">✓ 儲存</button>`;
+    <button class="btn-primary" onclick="submitForm('${type}')">✓ ${isEdit ? '更新' : '儲存'}</button>`;
 
   setImp(1);
+  _currentTags = [];
+  renderTagChips();
+  renderTagSuggest();
+}
+
+// Tag input helpers
+function renderTagChips() {
+  const wrap = document.getElementById('tag-wrap');
+  if (!wrap) return;
+  const input = document.getElementById('tag-input');
+  // Remove existing chips
+  wrap.querySelectorAll('.tag-chip').forEach(c => c.remove());
+  _currentTags.forEach((t, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.innerHTML = `#${esc(t)}<span class="tag-chip-x" data-i="${i}">×</span>`;
+    chip.querySelector('.tag-chip-x').onclick = () => removeTag(i);
+    wrap.insertBefore(chip, input);
+  });
+}
+function renderTagSuggest() {
+  const row = document.getElementById('tag-suggest-row');
+  if (!row) return;
+  const input = document.getElementById('tag-input');
+  const sug = suggestTags(_currentTags, input ? input.value : '');
+  row.innerHTML = sug.map(t => `<span class="tag-suggest" onclick="addTag('${esc(t)}')">${esc(t)}</span>`).join('');
+}
+function addTag(t) {
+  t = (t || '').trim().replace(/^#/, '');
+  if (!t) return;
+  if (_currentTags.includes(t)) return;
+  _currentTags.push(t);
+  const input = document.getElementById('tag-input');
+  if (input) input.value = '';
+  renderTagChips();
+  renderTagSuggest();
+}
+function removeTag(i) {
+  _currentTags.splice(i, 1);
+  renderTagChips();
+  renderTagSuggest();
+}
+function onTagKey(ev) {
+  const input = ev.target;
+  if (ev.key === 'Enter' || ev.key === ',' || ev.key === '，') {
+    ev.preventDefault();
+    if (input.value.trim()) addTag(input.value);
+  } else if (ev.key === 'Backspace' && !input.value && _currentTags.length > 0) {
+    removeTag(_currentTags.length - 1);
+  }
 }
 
 let _currentImp = 1;
@@ -863,8 +2320,14 @@ function setImp(n) {
 function gv(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
 
 function submitForm(type) {
+  // Commit any pending tag input
+  const tagInput = document.getElementById('tag-input');
+  if (tagInput && tagInput.value.trim()) addTag(tagInput.value);
+
   const name = gv('f-name');
   if (!name) { showToast('請填寫名稱'); return; }
+
+  const followupAtRaw = gv('f-followup');
   const rec = {
     type,
     name,
@@ -872,7 +2335,8 @@ function submitForm(type) {
     venue: gv('f-venue'),
     note: gv('f-note'),
     importance: _currentImp,
-    ocrText: _ocrText || '',
+    tags: [..._currentTags],
+    followupAt: followupAtRaw ? new Date(followupAtRaw).toISOString() : null,
   };
   if (type === 'contact') {
     rec.company = gv('f-company');
@@ -883,21 +2347,291 @@ function submitForm(type) {
   } else if (type === 'dm') {
     rec.company = gv('f-company');
     rec.keywords = gv('f-keywords');
+  } else if (type === 'lecture') {
+    rec.speaker = gv('f-speaker');
+    rec.transcript = gv('f-transcript');
+    rec.summary = gv('f-summary');
+    rec.keypoints = gv('f-keypoints').split('\n').map(s => s.trim()).filter(Boolean);
+    rec.actionItems = gv('f-actions').split('\n').map(s => s.trim()).filter(Boolean);
+    rec.keywords = gv('f-keywords');
   } else {
     rec.keywords = gv('f-keywords');
     rec.content = gv('f-content');
   }
-  addRecord(rec);
-  _ocrText = '';
-  closeModal('addModal');
-  render();
-  showToast('✓ 已儲存');
+
+  // Duplicate detection (only for contacts and only when not editing)
+  if (!editingId && type === 'contact') {
+    const dups = findDuplicates(rec, null);
+    if (dups.length > 0 && !document.getElementById('dup-confirmed')) {
+      showDupWarning(dups, type);
+      return;
+    }
+  }
+
+  if (editingId) {
+    if (_ocrText) rec.ocrText = _ocrText;
+    updateRecord(editingId, rec);
+    closeModal('addModal');
+    editingId = null;
+    _ocrText = '';
+    render();
+    showToast('✓ 已更新');
+  } else {
+    rec.ocrText = _ocrText || '';
+    addRecord(rec);
+    _ocrText = '';
+    closeModal('addModal');
+    render();
+    showToast('✓ 已儲存');
+  }
 }
 
-// ══════════════════════════════════════
-// ══════════════════════════════════════
+function showDupWarning(dups, type) {
+  const host = document.getElementById('dup-warn-host');
+  if (!host) return;
+  host.innerHTML = `<div class="dup-warn">
+    <div class="dup-warn-title">⚠️ 可能是重複資料</div>
+    <div>系統發現 ${dups.length} 筆相似紀錄：</div>
+    ${dups.slice(0, 3).map(d => `
+      <div class="dup-warn-card" onclick="closeModal('addModal');setTimeout(()=>openDetail('${d.r.id}'),300)">
+        <div class="avatar" style="width:28px;height:28px;font-size:11px;background:${avatarBg(d.r.name||d.r.id)};border-radius:6px">${initials(d.r.name||d.r.type)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:500;color:var(--text)">${esc(d.r.name)}</div>
+          <div style="font-size:10px;color:var(--text2)">${esc(d.r.company || '')} · ${d.why}</div>
+        </div>
+      </div>`).join('')}
+    <div style="display:flex;gap:6px;margin-top:8px">
+      <button class="btn-secondary" style="margin:0;flex:1;padding:8px;font-size:12px" onclick="document.getElementById('dup-warn-host').innerHTML='';document.getElementById('dup-warn-host').insertAdjacentHTML('beforebegin','<input type=hidden id=dup-confirmed value=1>');submitForm('${type}')">仍要新增</button>
+      <button class="btn-secondary" style="margin:0;flex:1;padding:8px;font-size:12px;color:var(--red)" onclick="closeModal('addModal')">取消</button>
+    </div>
+  </div>`;
+  // Scroll to top of modal
+  const modalBody = document.getElementById('addModalBody');
+  if (modalBody) modalBody.scrollTop = 0;
+}
+
+// ══════════════════════════════════════════════════════════════
+// EDIT (clean, with editingId state)
+// ══════════════════════════════════════════════════════════════
+function editRecord(id) {
+  const r = getById(id);
+  if (!r) return;
+  editingId = id;
+  closeModal('detailModal');
+  setTimeout(() => {
+    showAddForm(r.type);
+    openModal('addModal');
+    // Pre-fill
+    setTimeout(() => {
+      const set = (fid, val) => { const el = document.getElementById(fid); if (el && val != null) el.value = val; };
+      set('f-name', r.name); set('f-company', r.company); set('f-title', r.title);
+      set('f-phone', r.phone); set('f-email', r.email); set('f-line', r.line);
+      set('f-keywords', r.keywords); set('f-content', r.content);
+      set('f-venue', r.venue); set('f-note', r.note);
+      set('f-category', r.category);
+      // Lecture-specific
+      if (r.type === 'lecture') {
+        set('f-speaker', r.speaker);
+        set('f-transcript', r.transcript);
+        set('f-summary', r.summary);
+        set('f-keypoints', (r.keypoints || []).join('\n'));
+        set('f-actions', (r.actionItems || []).join('\n'));
+        updateTranscriptStats();
+        // If AI extraction was already done, show the section
+        if (r.summary || (r.keypoints && r.keypoints.length) || (r.actionItems && r.actionItems.length)) {
+          const aiResult = document.getElementById('ai-result');
+          if (aiResult) aiResult.style.display = 'block';
+        }
+      }
+      if (r.followupAt) {
+        const d = new Date(r.followupAt);
+        const iso = d.toISOString().slice(0,10);
+        set('f-followup', iso);
+      }
+      setImp(r.importance || 1);
+      _currentTags = [...(r.tags || [])];
+      renderTagChips();
+      renderTagSuggest();
+    }, 50);
+  }, 280);
+}
+
+// ══════════════════════════════════════════════════════════════
+// RELATIONS PICKER
+// ══════════════════════════════════════════════════════════════
+let _pickerFromId = null;
+function openPicker(fromId) {
+  _pickerFromId = fromId;
+  const fromRec = getById(fromId);
+  if (!fromRec) return;
+  const linked = new Set(fromRec.linkedIds || []);
+  // Sort: by find-related score + alphabetical fallback
+  const all = getAll().filter(r => r.id !== fromId && !linked.has(r.id));
+  const scoredRelated = findRelated(fromRec);
+  const scoreMap = new Map(scoredRelated.map(r => [r.id, r._score]));
+  const sorted = all.sort((a, b) => (scoreMap.get(b.id) || 0) - (scoreMap.get(a.id) || 0));
+
+  document.getElementById('pickerModalBody').innerHTML = `
+    <div class="search-wrap" style="margin-bottom:10px">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="search-input" id="pickerInput" placeholder="搜尋要連結的資料…" oninput="renderPickerResults()">
+    </div>
+    <div id="pickerResults"></div>`;
+  openModal('pickerModal');
+  _pickerAll = sorted;
+  renderPickerResults();
+}
+let _pickerAll = [];
+function renderPickerResults() {
+  const q = (document.getElementById('pickerInput')?.value || '').toLowerCase();
+  let list = _pickerAll;
+  if (q) {
+    list = list.filter(r =>
+      (r.name||'').toLowerCase().includes(q) ||
+      (r.company||'').toLowerCase().includes(q) ||
+      (r.category||'').toLowerCase().includes(q)
+    );
+  }
+  const host = document.getElementById('pickerResults');
+  if (list.length === 0) {
+    host.innerHTML = `<div class="empty"><div class="empty-icon">∅</div><div class="empty-text">沒有可連結的資料</div></div>`;
+    return;
+  }
+  host.innerHTML = list.slice(0, 50).map(r => `
+    <div class="picker-result" onclick="pickRecord('${r.id}')">
+      <div class="avatar ${TYPE_MAP[r.type]?.cls}" style="width:32px;height:32px;border-radius:8px;font-size:11px;background:${avatarBg(r.name||r.id)}">${initials(r.name||r.type)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.name || '（未命名）')}</div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${TYPE_MAP[r.type]?.label || ''} · ${esc(r.category || '')} ${r.company ? '· ' + esc(r.company) : ''}</div>
+      </div>
+    </div>`).join('');
+}
+function pickRecord(id) {
+  if (!_pickerFromId) return;
+  linkRecords(_pickerFromId, id);
+  closeModal('pickerModal');
+  showToast('✓ 已連結');
+  // Re-open detail to show new link
+  openDetail(_pickerFromId);
+}
+
+// ══════════════════════════════════════════════════════════════
+// MENU (settings, backup, restore)
+// ══════════════════════════════════════════════════════════════
+function openMenu() {
+  const all = getAll();
+  const live = all.filter(r => !isArchived(r));
+  const archived = all.filter(isArchived).length;
+  const pinned = live.filter(r => r.pinned).length;
+  const companies = aggregateBy('company').size;
+  const venues = aggregateBy('venue').size;
+  const lastBackup = localStorage.getItem(BACKUP_KEY);
+  const lastBackupTxt = lastBackup ? formatDateFull(new Date(parseInt(lastBackup)).toISOString()) : '從未備份';
+  document.getElementById('menuModalBody').innerHTML = `
+    <div class="card" style="background:var(--surface2)">
+      <div class="section-label" style="margin-bottom:8px">📊 資料總覽</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        共 ${all.length} 筆資料（${live.length} 活躍 / ${archived} 歸檔）<br>
+        ${all.filter(r=>r.type==='contact').length} 張名片 · ${all.filter(r=>r.type==='dm').length} 份 DM · ${all.filter(r=>r.type==='note').length} 則筆記 · ${all.filter(r=>r.type==='lecture').length} 則上課<br>
+        ${pinned} 筆釘選 · ${companies} 家公司 · ${venues} 個場合<br>
+        ${getAllTags().length} 個標籤<br>
+        儲存於：本機 localStorage
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label" style="margin-bottom:8px">🔭 視圖</div>
+      <button class="btn-secondary" style="margin:0 0 8px 0" onclick="openCompanyList()">🏢 公司一覽（${companies}）</button>
+      <button class="btn-secondary" style="margin:0 0 8px 0" onclick="openVenueList()">📍 場合一覽（${venues}）</button>
+      <button class="btn-secondary" style="margin:0 0 8px 0" onclick="closeModal('menuModal');openSmart('pinned')">📌 釘選清單（${pinned}）</button>
+      <button class="btn-secondary" style="margin:0" onclick="closeModal('menuModal');openSmart('archived')">📦 歸檔（${archived}）</button>
+    </div>
+
+    <div class="card">
+      <div class="section-label" style="margin-bottom:8px">💾 備份與還原</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;font-family:var(--mono)">上次備份：${lastBackupTxt}</div>
+      <button class="btn-secondary" style="margin:0 0 8px 0" onclick="exportData()">⬇️ 匯出 JSON 備份</button>
+      <button class="btn-secondary" style="margin:0" onclick="document.getElementById('importFileInput').click()">⬆️ 匯入備份檔</button>
+    </div>
+
+    <div class="card">
+      <div class="section-label" style="margin-bottom:8px">🛠️ 工具</div>
+      <button class="btn-secondary" style="margin:0 0 8px 0" onclick="openCatManager()">🗂️ 管理分類</button>
+      <button class="btn-secondary" style="margin:0 0 8px 0" onclick="toggleCompact();closeModal('menuModal')">${compactMode ? '▤ 切回卡片模式' : '☰ 切換緊湊模式'}</button>
+      <button class="btn-secondary" style="margin:0;color:var(--red)" onclick="confirmClearAll()">⚠️ 清空所有資料</button>
+    </div>
+
+    <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:14px;font-family:var(--mono)">
+      v2.1 · 本機儲存 · TF-IDF 相關推薦 · 自動歸檔
+    </div>`;
+  openModal('menuModal');
+}
+
+function exportData() {
+  const data = {
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    records: getAll(),
+    customCategories: loadCustomCats(),
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `knowledgehub-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  localStorage.setItem(BACKUP_KEY, String(Date.now()));
+  updateStats();
+  showToast('✓ 已下載備份檔');
+}
+
+function handleImport(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.records || !Array.isArray(data.records)) throw new Error('格式錯誤');
+      const choice = confirm(`匯入 ${data.records.length} 筆資料\n\n按「確定」= 合併（保留現有資料，跳過 ID 重複的）\n按「取消」= 取消\n\n如需「完全覆蓋」，請先清空所有資料再匯入。`);
+      if (!choice) { input.value = ''; return; }
+      // Merge by ID
+      const existing = loadDB();
+      const existingIds = new Set(existing.map(r => r.id));
+      const newRecords = data.records.filter(r => !existingIds.has(r.id));
+      const merged = [...newRecords, ...existing];
+      saveDB(merged);
+      if (data.customCategories) {
+        const cur = loadCustomCats();
+        saveCustomCats({ ...cur, ...data.customCategories });
+        CAT_MAP = getCAT_MAP();
+      }
+      closeModal('menuModal');
+      render();
+      showToast(`✓ 已匯入 ${newRecords.length} 筆新資料`);
+    } catch (err) {
+      showToast('匯入失敗：' + err.message);
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function confirmClearAll() {
+  if (!confirm('確定清空所有資料？\n此動作無法復原（建議先匯出備份）。')) return;
+  if (!confirm('再次確認：真的要清空？')) return;
+  localStorage.removeItem(DB_KEY);
+  _indexCache = null;
+  closeModal('menuModal');
+  render();
+  updateStats();
+  showToast('已清空');
+}
+
+// ══════════════════════════════════════════════════════════════
 // IMAGE UTILS — EXIF rotation fix
-// ══════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 let _ocrText = '';
 let _currentScanType = '';
 
@@ -905,7 +2639,6 @@ function triggerUpload() {
   document.getElementById('fileInput').click();
 }
 
-// Read EXIF orientation tag from ArrayBuffer
 function getExifOrientation(buffer) {
   const view = new DataView(buffer);
   if (view.getUint16(0, false) !== 0xFFD8) return 1;
@@ -929,7 +2662,6 @@ function getExifOrientation(buffer) {
   return 1;
 }
 
-// Draw image to canvas with correct orientation, return data URL
 function fixOrientation(file) {
   return new Promise((resolve) => {
     const reader = new FileReader();
@@ -943,10 +2675,8 @@ function fixOrientation(file) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         let w = img.naturalWidth, h = img.naturalHeight;
-        // Swap dimensions for 90/270 rotations
         if ([5,6,7,8].includes(orientation)) { canvas.width = h; canvas.height = w; }
         else { canvas.width = w; canvas.height = h; }
-        // Apply transform
         switch(orientation) {
           case 2: ctx.transform(-1,0,0,1,w,0); break;
           case 3: ctx.transform(-1,0,0,-1,w,h); break;
@@ -966,9 +2696,9 @@ function fixOrientation(file) {
   });
 }
 
-// ══════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 // OCR — Claude Vision API
-// ══════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 function handleScan(input, type) {
   const file = input.files[0];
   if (!file) return;
@@ -977,12 +2707,10 @@ function handleScan(input, type) {
   preview.innerHTML = `<div class="ocr-result"><span class="spinner"></span> 修正方向中…</div>`;
 
   fixOrientation(file).then(dataUrl => {
-    // Show corrected preview
     preview.innerHTML = `
       <img src="${dataUrl}" style="width:100%;border-radius:8px;margin-bottom:8px;max-height:220px;object-fit:contain;background:#000">
       <div class="ocr-result"><span class="spinner"></span> AI 辨識中…</div>`;
 
-    // Strip data URL prefix to get base64
     const base64 = dataUrl.split(',')[1];
     const prompt = type === 'contact'
       ? `這是一張名片圖片。請辨識並以 JSON 格式回傳以下欄位（找不到的留空字串）：
@@ -1017,7 +2745,6 @@ function handleScan(input, type) {
       } catch(e) {}
 
       if (parsed) {
-        // Auto-fill form fields
         const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
         if (type === 'contact') {
           set('f-name', parsed.name);
@@ -1038,64 +2765,179 @@ function handleScan(input, type) {
         if (imgEl) preview.appendChild(imgEl);
         preview.innerHTML += `<div class="ocr-result" style="margin-top:8px"><div class="ocr-label">✓ 辨識完成，欄位已自動填入</div>請確認並修正上方欄位內容。</div>`;
       } else {
-        // Show raw text if JSON parse failed
         _ocrText = text;
         const imgEl = preview.querySelector('img');
         preview.innerHTML = '';
         if (imgEl) preview.appendChild(imgEl);
-        preview.innerHTML += `<div class="ocr-result" style="margin-top:8px"><div class="ocr-label">辨識結果（請手動對照填入）</div>${text.replace(/\n/g,'<br>')}</div>`;
+        preview.innerHTML += `<div class="ocr-result" style="margin-top:8px"><div class="ocr-label">辨識結果（請手動對照填入）</div>${esc(text).replace(/\n/g,'<br>')}</div>`;
       }
     })
     .catch(err => {
       const imgEl = preview.querySelector('img');
       preview.innerHTML = '';
       if (imgEl) preview.appendChild(imgEl);
-      preview.innerHTML += `<div class="ocr-result" style="margin-top:8px;color:var(--red)">辨識失敗：${err.message}<br><small>請手動填寫欄位。</small></div>`;
+      preview.innerHTML += `<div class="ocr-result" style="margin-top:8px;color:var(--red)">辨識失敗：${esc(err.message)}<br><small>請手動填寫欄位。</small></div>`;
     });
   });
 }
 
-// ══════════════════════════════════════
-// EDIT
-// ══════════════════════════════════════
-function editRecord(id) {
-  const r = getById(id);
-  if (!r) return;
-  closeModal('detailModal');
-  setTimeout(() => {
-    showAddForm(r.type);
-    document.getElementById('addModalTitle').textContent = '編輯資料';
-    openModal('addModal');
-    // Pre-fill after DOM settles
-    setTimeout(() => {
-      const set = (fid, val) => { const el = document.getElementById(fid); if (el && val) el.value = val; };
-      set('f-name', r.name); set('f-company', r.company); set('f-title', r.title);
-      set('f-phone', r.phone); set('f-email', r.email); set('f-line', r.line);
-      set('f-keywords', r.keywords); set('f-content', r.content);
-      set('f-venue', r.venue); set('f-note', r.note);
-      set('f-category', r.category);
-      setImp(r.importance || 1);
-      // Override submit to update
-      const btn = document.querySelector('.btn-primary');
-      if (btn) btn.onclick = () => {
-        updateRecord(id, {
-          name: gv('f-name'), category: gv('f-category'),
-          company: gv('f-company'), title: gv('f-title'),
-          phone: gv('f-phone'), email: gv('f-email'), line: gv('f-line'),
-          keywords: gv('f-keywords'), content: gv('f-content'),
-          venue: gv('f-venue'), note: gv('f-note'), importance: _currentImp,
-        });
-        closeModal('addModal');
-        render();
-        showToast('✓ 已更新');
-      };
-    }, 60);
-  }, 300);
+// ══════════════════════════════════════════════════════════════
+// LECTURE TRANSCRIPT UPLOAD + AI EXTRACTION
+// ══════════════════════════════════════════════════════════════
+
+// Clean common subtitle formats (SRT, VTT) → plain transcript
+function cleanSubtitles(text, ext) {
+  if (ext !== 'srt' && ext !== 'vtt') return text;
+  return text
+    .replace(/^WEBVTT.*$/m, '')                             // VTT header
+    .replace(/^NOTE\b.*$/gm, '')                            // VTT comments
+    .replace(/^\d+\s*$/gm, '')                              // SRT cue numbers
+    .replace(/\d{2}:\d{2}:\d{2}[,.]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[,.]\d{3}.*$/gm, '') // timestamps
+    .replace(/<[^>]+>/g, '')                                // inline tags
+    .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')         // basic entities
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
-// ══════════════════════════════════════
+function updateTranscriptStats() {
+  const ta = document.getElementById('f-transcript');
+  const stats = document.getElementById('transcript-stats');
+  if (!ta || !stats) return;
+  const len = ta.value.length;
+  if (len === 0) { stats.textContent = ''; return; }
+  // rough reading time estimate: Mandarin ~300字/分鐘
+  const mins = Math.max(1, Math.round(len / 300));
+  stats.textContent = `${len.toLocaleString()} 字 · 約 ${mins} 分鐘閱讀`;
+}
+
+function handleTranscriptUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const sizeKB = (file.size / 1024).toFixed(1);
+  // soft size limit: 2 MB of text (≈ 600k chars)
+  if (file.size > 2 * 1024 * 1024) {
+    if (!confirm(`檔案較大（${sizeKB} KB），AI 分析可能會慢，仍要繼續？`)) {
+      input.value = '';
+      return;
+    }
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const raw = e.target.result || '';
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    const cleaned = cleanSubtitles(raw, ext);
+    const ta = document.getElementById('f-transcript');
+    if (ta) {
+      // If textarea already has content, append; otherwise replace
+      if (ta.value.trim()) {
+        if (!confirm('逐字稿欄位已有內容，要替換還是附加？\n\n確定 = 替換\n取消 = 附加在後面')) {
+          ta.value = ta.value.trimEnd() + '\n\n' + cleaned;
+        } else {
+          ta.value = cleaned;
+        }
+      } else {
+        ta.value = cleaned;
+      }
+    }
+    // Show file info badge
+    const info = document.getElementById('transcriptFileInfo');
+    if (info) {
+      info.innerHTML = `<div class="transcript-file-info">
+        <span style="font-size:14px">✓</span>
+        <span class="name">${esc(file.name)}</span>
+        <span class="meta">${sizeKB} KB · ${cleaned.length.toLocaleString()} 字</span>
+      </div>`;
+    }
+    updateTranscriptStats();
+    // If title is empty, use filename (without extension) as default
+    const nameEl = document.getElementById('f-name');
+    if (nameEl && !nameEl.value.trim()) {
+      nameEl.value = file.name.replace(/\.[^.]+$/, '');
+    }
+    showToast('✓ 逐字稿已載入');
+  };
+  reader.onerror = () => showToast('讀檔失敗：' + (reader.error?.message || '未知錯誤'));
+  reader.readAsText(file, 'utf-8');
+  // Allow re-selecting the same file later
+  input.value = '';
+}
+
+function extractFromTranscript() {
+  const transcript = (document.getElementById('f-transcript')?.value || '').trim();
+  if (!transcript) { showToast('請先上傳或貼上逐字稿'); return; }
+  if (transcript.length < 30) {
+    if (!confirm('逐字稿很短（少於 30 字），AI 可能抓不到重點。仍要分析？')) return;
+  }
+
+  const btn = document.getElementById('ai-extract-btn');
+  const result = document.getElementById('ai-result');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> AI 分析中（約 5-15 秒）…';
+  }
+
+  const prompt = `這是一段上課/講座/會議的逐字稿（繁體中文，可能有語音辨識的小錯誤，例如同音字錯誤）。請依下列 JSON 結構回傳分析：
+
+{
+  "summary": "整體摘要，3-5 句完整段落，繁體中文",
+  "keypoints": ["重點 1", "重點 2", "重點 3", "重點 4", "重點 5"],
+  "actionItems": ["可採取的行動或待辦 1", "..."],
+  "keywords": "5-8 個關鍵字，逗號分隔"
+}
+
+要求：
+- 全部用繁體中文
+- 如果語音辨識有明顯錯字，在摘要與重點中自然修正
+- 重點請涵蓋講者主要論點，每條 1-2 句話，5-8 條為宜
+- 如果沒有明確行動項目，actionItems 可以是空陣列 []
+- 只回傳純 JSON，不要 markdown 標記、不要其他說明
+
+逐字稿：
+${transcript}`;
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    const text = (data.content || []).map(b => b.text || '').join('');
+    let parsed = null;
+    try {
+      const clean = text.replace(/```json|```/g, '').trim();
+      parsed = JSON.parse(clean);
+    } catch (e) { /* fall through */ }
+
+    if (parsed) {
+      const set = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+      set('f-summary', parsed.summary || '');
+      set('f-keypoints', (parsed.keypoints || []).join('\n'));
+      set('f-actions', (parsed.actionItems || []).join('\n'));
+      const kwEl = document.getElementById('f-keywords');
+      if (parsed.keywords && kwEl && !kwEl.value.trim()) kwEl.value = parsed.keywords;
+      if (result) result.style.display = 'block';
+      showToast('✓ AI 已抓出重點');
+      if (result) result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      showToast('AI 回傳格式錯誤，請重試');
+      console.warn('AI raw response:', text);
+    }
+    if (btn) { btn.disabled = false; btn.innerHTML = '🤖 重新分析'; }
+  })
+  .catch(err => {
+    showToast('分析失敗：' + err.message);
+    if (btn) { btn.disabled = false; btn.innerHTML = '🤖 用 AI 抓重點'; }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
 // MODAL HELPERS
-// ══════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 function openModal(id) {
   const el = document.getElementById(id);
   el.classList.add('open');
@@ -1103,11 +2945,16 @@ function openModal(id) {
 }
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
+  if (id === 'addModal') {
+    editingId = null;
+    _ocrText = '';
+    _currentTags = [];
+  }
 }
 
-// ══════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 // UTILS
-// ══════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 function formatDate(iso) {
   if (!iso) return '';
   const d = new Date(iso);
@@ -1126,13 +2973,36 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-function toggleStorageInfo() {
-  showToast('目前使用本機儲存，資料僅存在此裝置');
+let _undoTimer = null;
+let _undoCountdown = null;
+function showUndoBar(msg) {
+  const bar = document.getElementById('undoBar');
+  document.getElementById('undoMsg').textContent = msg;
+  bar.classList.add('show');
+  let s = 5;
+  document.getElementById('undoTimer').textContent = s;
+  clearInterval(_undoCountdown);
+  _undoCountdown = setInterval(() => {
+    s--;
+    if (s <= 0) {
+      hideUndoBar();
+    } else {
+      document.getElementById('undoTimer').textContent = s;
+    }
+  }, 1000);
+  clearTimeout(_undoTimer);
+  _undoTimer = setTimeout(() => hideUndoBar(), 5000);
+}
+function hideUndoBar() {
+  document.getElementById('undoBar').classList.remove('show');
+  _lastDeleted = null;
+  clearInterval(_undoCountdown);
+  clearTimeout(_undoTimer);
 }
 
-// ══════════════════════════════════════
-// CATEGORY MANAGER
-// ══════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+// CATEGORY MANAGER (kept from original, minor tweaks)
+// ══════════════════════════════════════════════════════════════
 function openCatManager() {
   renderCatManager();
   openModal('catModal');
@@ -1155,7 +3025,6 @@ function renderCatManager() {
 
   let html = '';
 
-  // New category form
   html += `
   <div class="card" style="margin-bottom:14px;background:var(--surface2)">
     <div class="section-label" style="margin-bottom:10px">＋ 新增自訂分類</div>
@@ -1166,7 +3035,7 @@ function renderCatManager() {
     <div class="form-group" style="margin-bottom:10px">
       <label class="form-label">群組（選填）</label>
       <input class="form-input" id="nc-group" placeholder="例：產品與製造" list="group-list">
-      <datalist id="group-list">${[...new Set(Object.values(CAT_MAP).map(v=>v.group||'其他'))].map(g=>`<option value="${g}">`).join('')}</datalist>
+      <datalist id="group-list">${[...new Set(Object.values(CAT_MAP).map(v=>v.group||'其他'))].map(g=>`<option value="${esc(g)}">`).join('')}</datalist>
     </div>
     <div class="form-group" style="margin-bottom:10px">
       <label class="form-label">圖示</label>
@@ -1185,24 +3054,22 @@ function renderCatManager() {
     <button class="btn-primary" onclick="saveNewCat()">✓ 新增分類</button>
   </div>`;
 
-  // Existing categories by group
   html += `<div class="section-label">現有分類</div>`;
   Object.entries(groups).forEach(([g, cats]) => {
-    html += `<div style="margin-bottom:4px;font-size:11px;color:var(--text3);padding:4px 0;border-bottom:1px solid var(--border)">${g}</div>`;
+    html += `<div style="margin-bottom:4px;font-size:11px;color:var(--text3);padding:4px 0;border-bottom:1px solid var(--border)">${esc(g)}</div>`;
     cats.forEach(({ name, info, isCustom }) => {
       const count = usageCounts[name] || 0;
       html += `<div style="display:flex;align-items:center;gap:8px;padding:8px 4px;border-bottom:1px solid var(--border)">
         <span style="font-size:18px">${info.icon}</span>
-        <span class="tag ${info.color}" style="flex:1">${name}</span>
+        <span class="tag ${info.color}" style="flex:1">${esc(name)}</span>
         <span style="font-size:11px;color:var(--text3)">${count ? count+'筆' : ''}</span>
-        ${isCustom ? `<button onclick="deleteCustomCat('${name}')" style="background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:0 4px" title="刪除">×</button>` : '<span style="width:26px"></span>'}
+        ${isCustom ? `<button onclick="deleteCustomCat('${esc(name)}')" style="background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:0 4px" title="刪除">×</button>` : '<span style="width:26px"></span>'}
       </div>`;
     });
     html += `<div style="margin-bottom:10px"></div>`;
   });
 
   document.getElementById('catModalBody').innerHTML = html;
-  // highlight default emoji & color
   pickColor(CAT_COLORS[0], true);
 }
 
@@ -1250,31 +3117,40 @@ function deleteCustomCat(name) {
   renderCatManager();
 }
 
-// ══════════════════════════════════════
-// SEED DATA (demo)
-// ══════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+// SEED DATA (demo) — only on totally fresh install
+// ══════════════════════════════════════════════════════════════
 function seedIfEmpty() {
   if (getAll().length > 0) return;
   const demos = [
-    { type:'contact', name:'陳志明', company:'台灣美妝原料', title:'業務總監', phone:'0912-345-678', email:'chen@twraw.com', category:'供應鏈人脈', venue:'2024 台北國際美容展', importance:3, note:'專門供應玻尿酸、菸鹼醯胺等功能性原料，可以詢報價' },
-    { type:'contact', name:'林雅琪', company:'捷揚包裝', title:'客戶經理', email:'lin@jieyang.com', category:'通路人脈', venue:'2024 台北國際美容展', importance:2, note:'環保包材專家，有玻璃瓶和生質塑膠方案' },
-    { type:'dm', name:'SGS 化妝品安全測試服務簡介', company:'SGS Taiwan', keywords:'安全測試,防腐效力,重金屬,歐盟法規', category:'安全測試', venue:'2024 台北國際美容展', importance:2, note:'含台灣、歐盟、美國市場的測試套組報價' },
-    { type:'dm', name:'蝦皮商城美妝類入駐方案', company:'蝦皮購物', keywords:'電商,蝦皮,開店,物流,廣告投放', category:'電商平台', venue:'電商研討會', importance:1 },
-    { type:'note', name:'衛福部化妝品新規摘要（2024）', keywords:'化妝品法規,衛福部,GMP,標示,備查', category:'化妝品法規', venue:'法規說明會', importance:3, content:'2024年起所有化妝品須符合GMP規範，並於上市前完成備查登錄，有效成分濃度須符合公告限量…', note:'要讓代工廠確認是否已取得GMP認證' },
-    { type:'note', name:'日本市場進入策略筆記', keywords:'日本,薬機法,越境EC,代理商,Amazon JP', category:'海外市場情報', venue:'跨境電商論壇', importance:2, content:'日本進口化妝品需通過藥機法申報，建議找日本當地代理商協助，越境EC可先用Amazon JP測試市場反應…', note:'下次可聯繫林雅琪介紹的日本代理' },
+    { type:'contact', name:'陳志明', company:'台灣美妝原料', title:'業務總監', phone:'0912-345-678', email:'chen@twraw.com', category:'供應鏈人脈', venue:'2024 台北國際美容展', importance:3, note:'專門供應玻尿酸、菸鹼醯胺等功能性原料，可以詢報價', tags:['2024展','潛力','待跟進'] },
+    { type:'contact', name:'林雅琪', company:'捷揚包裝', title:'客戶經理', email:'lin@jieyang.com', category:'通路人脈', venue:'2024 台北國際美容展', importance:2, note:'環保包材專家，有玻璃瓶和生質塑膠方案', tags:['2024展','環保'] },
+    { type:'dm', name:'SGS 化妝品安全測試服務簡介', company:'SGS Taiwan', keywords:'安全測試,防腐效力,重金屬,歐盟法規', category:'安全測試', venue:'2024 台北國際美容展', importance:2, note:'含台灣、歐盟、美國市場的測試套組報價', tags:['2024展','法規必看'] },
+    { type:'dm', name:'蝦皮商城美妝類入駐方案', company:'蝦皮購物', keywords:'電商,蝦皮,開店,物流,廣告投放', category:'電商平台', venue:'電商研討會', importance:1, tags:['電商'] },
+    { type:'note', name:'衛福部化妝品新規摘要（2024）', keywords:'化妝品法規,衛福部,GMP,標示,備查', category:'化妝品法規', venue:'法規說明會', importance:3, content:'2024年起所有化妝品須符合GMP規範，並於上市前完成備查登錄，有效成分濃度須符合公告限量…', note:'要讓代工廠確認是否已取得GMP認證', tags:['法規必看','GMP'] },
+    { type:'note', name:'日本市場進入策略筆記', keywords:'日本,薬機法,越境EC,代理商,Amazon JP', category:'海外市場情報', venue:'跨境電商論壇', importance:2, content:'日本進口化妝品需通過藥機法申報，建議找日本當地代理商協助，越境EC可先用Amazon JP測試市場反應…', note:'下次可聯繫林雅琪介紹的日本代理', tags:['日本','跨境'] },
   ];
   demos.forEach((d, i) => {
     const db = loadDB();
     const ts = new Date(Date.now() - i * 86400000 * 2).toISOString();
-    db.push({ ...d, id: (Date.now() + i).toString(), createdAt: ts });
+    db.push({
+      ...d,
+      id: (Date.now() + i).toString(),
+      createdAt: ts,
+      updatedAt: ts,
+      linkedIds: [],
+      followupAt: null,
+      tags: d.tags || [],
+    });
     localStorage.setItem(DB_KEY, JSON.stringify(db));
   });
+  _indexCache = null;
   updateStats();
 }
 
-// ══════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 // INIT
-// ══════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 seedIfEmpty();
 updateStats();
 showPage('browse');
