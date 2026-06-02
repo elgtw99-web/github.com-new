@@ -381,6 +381,32 @@ input[type=file] { display: none; }
 }
 .rel-unlink:hover { color: var(--red); }
 
+/* Quick actions (call / email / copy) + follow-up actions */
+.qa-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+.fu-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.qa-btn {
+  flex: 1; min-width: calc(50% - 3px);
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 10px 10px; border-radius: var(--radius-sm);
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); font-size: 13px; font-family: var(--font);
+  text-decoration: none; cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.qa-btn:hover { border-color: var(--accent); color: var(--accent); }
+.qa-btn:active { background: var(--surface3); transform: scale(.98); }
+
+/* One-tap "done" on follow-up cards */
+.fu-done {
+  flex-shrink: 0; align-self: center;
+  background: var(--green-bg); color: var(--green);
+  border: 1px solid transparent; border-radius: 8px;
+  padding: 7px 11px; font-size: 14px; cursor: pointer;
+  font-family: var(--font); line-height: 1;
+}
+.fu-done:hover { border-color: var(--green); }
+.fu-done:active { transform: scale(.94); }
+
 /* Picker (for linking) */
 .picker-result {
   padding: 8px 10px; border-radius: 6px;
@@ -493,8 +519,8 @@ input[type=file] { display: none; }
   position: absolute;
   top: 10px; right: 10px;
   background: none; border: none; cursor: pointer;
-  color: var(--text3); opacity: 0.3;
-  font-size: 14px; padding: 4px 6px; line-height: 1;
+  color: var(--text3); opacity: 0.5;
+  font-size: 16px; padding: 6px 8px; line-height: 1;
   transition: opacity .15s, color .15s, transform .1s;
   z-index: 2; border-radius: 6px;
 }
@@ -724,6 +750,49 @@ input[type=file] { display: none; }
   color: var(--accent); font-size: 11px; font-family: var(--mono);
   padding: 4px 0;
 }
+
+/* ═══════════════════════════════════════════════════════
+   AI 匯總 / 分析
+   ═══════════════════════════════════════════════════════ */
+.ai-banner {
+  background: linear-gradient(135deg, var(--blue-bg), var(--surface));
+  border: 1px solid rgba(45,125,210,0.25);
+  border-radius: var(--radius); padding: 12px 14px; margin-bottom: 16px;
+}
+.ai-banner-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.ai-banner-sub { font-size: 11px; color: var(--text2); margin-top: 2px; line-height: 1.5; }
+.ai-banner-btns { display: flex; gap: 8px; margin-top: 10px; }
+.ai-banner-btn {
+  flex: 1; text-align: center; padding: 9px 8px; border-radius: var(--radius-sm);
+  background: var(--surface); border: 1px solid var(--border); cursor: pointer;
+  font-size: 12.5px; color: var(--text); font-family: var(--font);
+  transition: border-color .15s, color .15s, transform .1s;
+}
+.ai-banner-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ai-banner-btn:active { transform: scale(.98); }
+
+.ai-answer {
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 3px solid var(--accent); border-radius: var(--radius-sm);
+  padding: 14px; font-size: 13.5px; line-height: 1.75; white-space: pre-wrap;
+  color: var(--text);
+}
+.ai-prio {
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 8px 10px; margin-bottom: 6px; background: var(--surface);
+  border-left: 3px solid var(--amber);
+}
+.ai-prio-name { font-size: 13px; font-weight: 500; }
+.ai-prio-why { font-size: 11px; color: var(--text2); margin-top: 2px; line-height: 1.5; }
+.ai-meta { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-bottom: 10px; line-height: 1.5; }
+
+.ask-suggest-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 16px; }
+.ask-chip {
+  font-size: 12px; padding: 6px 12px; border-radius: 18px;
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text2); cursor: pointer; font-family: var(--font);
+}
+.ask-chip:hover { border-color: var(--accent); color: var(--accent); }
 </style>
 </head>
 <body>
@@ -735,6 +804,9 @@ input[type=file] { display: none; }
   <div class="topbar-actions">
     <span class="storage-badge" id="storageBadge" onclick="openMenu()">本機模式</span>
     <span class="topbar-stats" id="topStats">0 筆資料</span>
+    <button class="icon-btn" onclick="showPage('search')" title="搜尋">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
     <button class="icon-btn" onclick="openMenu()" title="選單">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
     </button>
@@ -780,7 +852,7 @@ input[type=file] { display: none; }
     <div class="modal-handle"></div>
     <div class="modal-header">
       <span class="modal-title" id="addModalTitle">新增資料</span>
-      <button class="modal-close" onclick="closeModal('addModal')">×</button>
+      <button class="modal-close" onclick="requestCloseAdd()">×</button>
     </div>
     <div class="modal-body" id="addModalBody"></div>
   </div>
@@ -834,6 +906,18 @@ input[type=file] { display: none; }
   </div>
 </div>
 
+<!-- AI Report Modal -->
+<div class="modal-overlay" id="aiReportModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">🧠 AI 洞察報告</span>
+      <button class="modal-close" onclick="closeModal('aiReportModal')">×</button>
+    </div>
+    <div class="modal-body" id="aiReportBody"></div>
+  </div>
+</div>
+
 <!-- Toast & Undo -->
 <div class="toast" id="toast"></div>
 <div class="undo-bar" id="undoBar">
@@ -853,6 +937,49 @@ const LEGACY_KEY = 'knowledgehub_v1';
 const CATS_KEY = 'knowledgehub_cats';
 const BACKUP_KEY = 'knowledgehub_lastbackup';
 const BACKUP_WARN_DAYS = 14;
+
+// ── AI / Anthropic API config ──────────────────────────────────
+// When this page is hosted (e.g. GitHub Pages) the browser calls the
+// Anthropic API directly, which requires the user's own API key plus the
+// CORS opt-in header. Inside the claude.ai preview, calls work without a key.
+const AI_MODEL = 'claude-sonnet-4-6';
+const APIKEY_KEY = 'knowledgehub_apikey';
+function getApiKey() { try { return localStorage.getItem(APIKEY_KEY) || ''; } catch (e) { return ''; } }
+function setApiKey(k) { try { if (k) localStorage.setItem(APIKEY_KEY, k); else localStorage.removeItem(APIKEY_KEY); } catch (e) {} }
+function aiHeaders() {
+  const h = { 'content-type': 'application/json' };
+  const k = getApiKey();
+  if (k) {
+    h['x-api-key'] = k;
+    h['anthropic-version'] = '2023-06-01';
+    h['anthropic-dangerous-direct-browser-access'] = 'true';
+  }
+  return h;
+}
+function aiErrorHint(err) {
+  const msg = (err && err.message) ? err.message : String(err || '');
+  if (!getApiKey() && (/load failed|failed to fetch|networkerror|cors|null is not an object/i.test(msg) || msg === '')) {
+    return 'AI 連線失敗：這個網站需要你自己的 Anthropic API 金鑰。請點右上角「⋮ → 🔑 AI 設定」貼上金鑰後再試一次。';
+  }
+  return msg || '未知錯誤';
+}
+function saveApiKeyFromMenu() {
+  const el = document.getElementById('apikey-input');
+  const k = (el ? el.value : '').trim();
+  if (!k) { showToast('請先貼上金鑰'); return; }
+  if (!/^sk-ant-/.test(k)) {
+    if (!confirm('這看起來不像 Anthropic 金鑰（通常以 sk-ant- 開頭）。仍要儲存嗎？')) return;
+  }
+  setApiKey(k);
+  showToast('✓ 金鑰已儲存，AI 功能已啟用');
+  openMenu(); // refresh status
+}
+function clearApiKeyFromMenu() {
+  if (!confirm('確定清除已儲存的 API 金鑰？')) return;
+  setApiKey('');
+  showToast('已清除金鑰');
+  openMenu();
+}
 
 (function migrate(){
   // v1 -> v2: add tags, linkedIds, updatedAt, followupAt
@@ -991,7 +1118,7 @@ const TYPE_MAP = {
   contact: { label: '名片', icon: '👤', cls: 'type-contact' },
   dm:      { label: 'DM',   icon: '📄', cls: 'type-dm' },
   note:    { label: '筆記', icon: '📝', cls: 'type-note' },
-  lecture: { label: '上課', icon: '🎓', cls: 'type-lecture' },
+  lecture: { label: '演講', icon: '🎓', cls: 'type-lecture' },
 };
 const IMP_MAP = { 1: { cls: 'imp-1', label: '備用' }, 2: { cls: 'imp-2', label: '重要' }, 3: { cls: 'imp-3', label: '必用' } };
 
@@ -1035,7 +1162,7 @@ function recordText(r) {
   return [
     r.name, r.company, r.title, r.keywords, r.content,
     r.note, r.venue, r.category, r.speaker,
-    r.transcript, r.summary,
+    r.transcript, r.summary, r.slidesText,
     (r.keypoints || []).join(' '),
     (r.actionItems || []).join(' '),
     (r.tags || []).join(' '),
@@ -1313,7 +1440,7 @@ function showView(view) {
   if (navId) document.getElementById(navId).classList.add('active');
   // FAB visibility
   const fab = document.getElementById('fab');
-  fab.style.display = (view.type === 'search') ? 'none' : 'flex';
+  fab.style.display = (view.type === 'search' || view.type === 'ask') ? 'none' : 'flex';
   // Scroll main back to top
   const main = document.getElementById('mainContent');
   if (main) main.scrollTop = 0;
@@ -1382,6 +1509,7 @@ function render() {
   else if (v.type === 'group') mc.innerHTML = renderGroupView(v.kind, v.value);
   else if (v.type === 'group-list') mc.innerHTML = renderGroupList(v.kind);
   else if (v.type === 'smart') mc.innerHTML = renderSmartView(v.filter);
+  else if (v.type === 'ask') mc.innerHTML = renderAsk();
 }
 
 function renderBrowse() {
@@ -1404,6 +1532,16 @@ function renderBrowse() {
     html += `<div class="empty"><div class="empty-icon">🗂️</div><div class="empty-text">還沒有任何資料<br>點右下角 + 開始新增</div></div>`;
     return html;
   }
+
+  // 🤖 AI 助理入口
+  html += `<div class="ai-banner">
+    <div class="ai-banner-title">🤖 AI 助理</div>
+    <div class="ai-banner-sub">讓 AI 幫你匯總整個資料庫、回答關於人脈與知識的問題</div>
+    <div class="ai-banner-btns">
+      <div class="ai-banner-btn" onclick="openAIReport()">🧠 洞察報告</div>
+      <div class="ai-banner-btn" onclick="openAsk()">💬 問你的人脈庫</div>
+    </div>
+  </div>`;
 
   // 📌 釘選 section
   const pinned = live.filter(r => r.pinned).sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
@@ -1428,6 +1566,7 @@ function renderBrowse() {
               <span class="followup-badge ${st.kind === 'overdue' ? 'followup-overdue' : ''}">⏰ ${st.label}</span>
             </div>
           </div>
+          <button class="fu-done" onclick="event.stopPropagation();completeFollowup('${r.id}')" title="完成跟進">✓</button>
         </div>
       </div>`).join('');
   }
@@ -1626,10 +1765,10 @@ function renderSearch() {
     <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <input class="search-input" id="searchInput" placeholder="搜尋名字、公司、關鍵字、#標籤…" oninput="doSearch(this.value)" autofocus>
   </div>
-  <div style="margin-bottom:14px;font-size:11px;color:var(--text3);font-family:var(--mono)">
-    💡 提示：用 #標籤 直接搜尋標籤；多個關鍵字以空格分隔（OR 搜尋）
+  <div style="margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.6">
+    💡 可以找人名、公司、關鍵字或備注內容。<br>想找標籤就加 <span style="font-family:var(--mono);color:var(--accent)">#</span>，例如 <span style="font-family:var(--mono);color:var(--accent)">#待跟進</span>。
   </div>
-  <div id="searchResults"><div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">輸入關鍵字搜尋</div></div></div>`;
+  <div id="searchResults"><div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">輸入關鍵字開始搜尋</div></div></div>`;
 }
 
 function doSearch(q) {
@@ -1708,7 +1847,7 @@ function renderCard(r, opts) {
         <div class="card-date">
           <span><span class="imp-dot ${imp.cls}"></span>${imp.label}</span>
           ${r.venue ? `<span>· ${highlight(r.venue, matched)}</span>` : ''}
-          <span>· ${formatDate(r.createdAt)}</span>
+          <span>· ${relTime(r.createdAt)}</span>
           ${fu && (fu.kind === 'overdue' || fu.kind === 'today' || fu.kind === 'soon')
             ? `<span class="followup-badge ${fu.kind === 'overdue' ? 'followup-overdue' : ''}">⏰ ${fu.label}</span>` : ''}
         </div>
@@ -1774,6 +1913,10 @@ function renderGroupView(kind, value) {
       <div class="group-summary-stats">${all.length} 筆 · ${counts.contact} 名片 · ${counts.dm} DM · ${counts.note} 筆記${counts.lecture ? ` · ${counts.lecture} 上課` : ''}</div>
     </div>
   </div>`;
+
+  // 🤖 AI 摘要這個公司/場合
+  html += `<button class="ai-banner-btn" style="margin-bottom:12px" onclick="runGroupSummary('${kind}','${esc(value)}')">🤖 AI 摘要這個${label}</button>
+  <div id="groupAiBody"></div>`;
 
   // Type filter
   const types = ['all', 'contact', 'dm', 'note', 'lecture'].filter(t => t === 'all' || counts[t] > 0);
@@ -1939,6 +2082,10 @@ function openDetail(id) {
   } else if (r.type === 'lecture') {
     if (r.speaker) fields += detailRow('🎤', '講者', esc(r.speaker));
     if (r.keywords) fields += detailRow('🔑', '關鍵字', esc(r.keywords));
+    if (r.slidesText) {
+      const sc = (r.slidesText.match(/【投影片/g) || []).length;
+      fields += detailRow('📑', '簡報', `${sc ? sc + ' 頁 · ' : ''}${r.slidesText.length} 字`);
+    }
     if (r.transcript) fields += detailRow('📝', '逐字稿', `${r.transcript.length} 字`);
   } else {
     if (r.keywords) fields += detailRow('🔑', '關鍵字', esc(r.keywords));
@@ -2023,6 +2170,14 @@ function openDetail(id) {
         <ul class="kp-list action-list">${r.actionItems.map(p => `<li>${esc(p)}</li>`).join('')}</ul>
       </div>`;
     }
+    if (r.slidesText) {
+      const slidesId = 'slides-' + r.id;
+      const sc = (r.slidesText.match(/【投影片/g) || []).length;
+      lectureHtml += `<div style="margin-top:14px">
+        <div class="section-label">📑 簡報內容${sc ? `（${sc} 頁）` : ''} <button class="collapse-btn" onclick="toggleTranscript('${slidesId}')">展開 ▼</button></div>
+        <div class="transcript-box" id="${slidesId}" style="display:none">${esc(r.slidesText)}</div>
+      </div>`;
+    }
     if (r.transcript) {
       const transId = 'transcript-' + r.id;
       lectureHtml += `<div style="margin-top:14px">
@@ -2030,6 +2185,37 @@ function openDetail(id) {
         <div class="transcript-box" id="${transId}" style="display:none">${esc(r.transcript)}</div>
       </div>`;
     }
+    // Cloud / backup export for this deck
+    lectureHtml += `<div style="margin-top:16px">
+      <button class="btn-secondary" style="margin:0" onclick="exportRecordMarkdown('${r.id}')">☁️ 匯出摘要檔（存 Google Drive／雲端）</button>
+      <div style="font-size:10px;color:var(--text3);margin-top:6px;line-height:1.5">會下載一份 Markdown 檔（含摘要、重點、簡報逐頁文字），可直接拖進雲端硬碟保存或分享。</div>
+    </div>`;
+  }
+
+  // Quick actions for contacts: call / email / copy (saves digging into the row list)
+  let quickActions = '';
+  if (r.type === 'contact') {
+    const qa = [];
+    if (r.phone) qa.push(`<a class="qa-btn" href="tel:${esc(r.phone)}">📞 撥打</a>`);
+    if (r.email) qa.push(`<a class="qa-btn" href="mailto:${esc(r.email)}">✉️ 寄信</a>`);
+    if (r.phone) qa.push(`<button class="qa-btn" onclick="copyText('${esc(r.phone)}','電話')">⧉ 複製電話</button>`);
+    if (r.email) qa.push(`<button class="qa-btn" onclick="copyText('${esc(r.email)}','Email')">⧉ 複製 Email</button>`);
+    if (qa.length) quickActions = `<div class="qa-row">${qa.join('')}</div>`;
+  }
+
+  // Follow-up quick actions: complete / reschedule without opening the editor
+  let followupActions = '';
+  if (r.followupAt) {
+    followupActions = `<div class="fu-actions">
+      <button class="qa-btn" onclick="completeFollowup('${r.id}')">✓ 完成跟進</button>
+      <button class="qa-btn" onclick="rescheduleFollowup('${r.id}',7)">改約 7 天</button>
+      <button class="qa-btn" onclick="rescheduleFollowup('${r.id}',30)">改約 30 天</button>
+    </div>`;
+  } else if (r.type === 'contact') {
+    followupActions = `<div class="fu-actions">
+      <button class="qa-btn" onclick="rescheduleFollowup('${r.id}',7)">⏰ 7 天後提醒我</button>
+      <button class="qa-btn" onclick="rescheduleFollowup('${r.id}',30)">⏰ 30 天後提醒我</button>
+    </div>`;
   }
 
   document.getElementById('detailModalBody').innerHTML = `
@@ -2038,7 +2224,9 @@ function openDetail(id) {
       <div class="detail-name">${esc(r.name || '（未命名）')}${r.pinned ? ' <span style="color:var(--amber)" title="已釘選">★</span>' : ''}${isArchived(r) ? ' <span class="archive-badge">📦 歸檔</span>' : ''}</div>
       <div class="detail-role">${typeInfo.label} · ${esc(r.category || '其他')}</div>
     </div>
+    ${quickActions}
     ${fields}
+    ${followupActions}
     ${tagsHtml}
     ${lectureHtml}
     ${r.note ? `<div style="margin-top:14px"><div class="section-label">備注 / 心得</div><div class="ocr-result" style="margin-top:6px">${esc(r.note).replace(/\n/g,'<br>')}</div></div>` : ''}
@@ -2046,6 +2234,11 @@ function openDetail(id) {
     ${r.ocrText ? `<div style="margin-top:14px"><div class="section-label">原始辨識文字</div><div class="ocr-result" style="margin-top:6px">${esc(r.ocrText).replace(/\n/g,'<br>')}</div></div>` : ''}
     ${linkedHtml}
     ${relatedHtml}
+    <div style="margin-top:18px">
+      <div class="section-label">🤖 AI 分析</div>
+      <div id="recordAiBody">${r.aiInsight ? renderRecordInsight(r) : ''}</div>
+      <button class="btn-secondary" id="recordAiBtn" onclick="runRecordAnalysis('${r.id}')" style="margin-top:8px">${r.aiInsight ? '🔄 重新分析' : (r.type === 'contact' ? '🤖 AI 分析這個人' : '🤖 AI 分析這筆')}</button>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:20px">
       <button class="btn-secondary" onclick="togglePinFromDetail('${r.id}')" style="margin:0;color:${r.pinned ? 'var(--amber)' : 'var(--text2)'}">${r.pinned ? '★ 取消釘選' : '☆ 釘選'}</button>
       <button class="btn-secondary" onclick="editRecord('${r.id}')" style="margin:0">✏️ 編輯</button>
@@ -2120,7 +2313,7 @@ function openAddModal() {
     { type: 'contact', icon: '👤', label: '名片 / 聯絡人' },
     { type: 'dm', icon: '📄', label: '展場 DM / 型錄' },
     { type: 'note', icon: '📝', label: '知識 / 技能筆記' },
-    { type: 'lecture', icon: '🎓', label: '上課 / 講座筆記', sub: '上傳逐字稿 → AI 抓重點' },
+    { type: 'lecture', icon: '🎓', label: '演講 / 會議 / 研討會', sub: '上傳簡報或逐字稿 → AI 摘要' },
   ];
   document.getElementById('addModalTitle').textContent = '選擇類型';
   document.getElementById('addModalBody').innerHTML = `
@@ -2190,11 +2383,24 @@ function showAddForm(type) {
       <div class="form-group"><label class="form-label">關鍵字（逗號分隔）</label><input class="form-input" id="f-keywords" placeholder="行銷自動化, MarTech, SaaS"></div>`;
   } else if (type === 'lecture') {
     typeFields = `
-      <div class="form-group"><label class="form-label">課程 / 講座名稱 *</label><input class="form-input" id="f-name" placeholder="2024 美容展 趨勢論壇"></div>
-      <div class="form-group"><label class="form-label">講者（選填）</label><input class="form-input" id="f-speaker" placeholder="王老師 / 林教授"></div>
+      <div class="form-group"><label class="form-label">演講 / 會議 / 研討會名稱 *</label><input class="form-input" id="f-name" placeholder="2024 美容展 趨勢論壇"></div>
+      <div class="form-group"><label class="form-label">講者 / 主講單位（選填）</label><input class="form-input" id="f-speaker" placeholder="王老師 / 林教授 / 主辦單位"></div>
 
       <div class="form-group">
-        <label class="form-label">逐字稿 <span style="color:var(--text3);font-family:var(--font);text-transform:none">（上傳檔案或直接貼上）</span></label>
+        <label class="form-label">📑 會議 / 研討會簡報 <span style="color:var(--text3);font-family:var(--font);text-transform:none">（上傳投影片檔，自動抽取每頁文字）</span></label>
+        <div class="upload-zone" onclick="document.getElementById('slidesFileInput').click()">
+          <div class="upload-zone-icon">📑</div>
+          <div class="upload-zone-text">點此上傳簡報檔（PDF / PPTX）</div>
+          <div class="upload-zone-sub">逐頁抽出文字 → 交給 AI 摘要；原始檔請自行保留備份</div>
+        </div>
+        <input type="file" id="slidesFileInput" accept=".pdf,.pptx,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation" onchange="handleSlidesUpload(this)">
+        <div id="slidesFileInfo"></div>
+        <textarea class="form-textarea" id="f-slides" placeholder="或直接貼上簡報重點／逐頁文字…" style="min-height:100px;margin-top:10px" oninput="updateSlidesStats()"></textarea>
+        <div id="slides-stats" style="font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono);text-align:right"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">逐字稿 / 會議記錄 <span style="color:var(--text3);font-family:var(--font);text-transform:none">（選填，上傳或貼上）</span></label>
         <div class="upload-zone" onclick="document.getElementById('transcriptFileInput').click()">
           <div class="upload-zone-icon">📄</div>
           <div class="upload-zone-text">點此上傳逐字稿檔案</div>
@@ -2202,12 +2408,12 @@ function showAddForm(type) {
         </div>
         <input type="file" id="transcriptFileInput" accept=".txt,.md,.srt,.vtt,.pdf,.docx,text/plain,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="handleTranscriptUpload(this)">
         <div id="transcriptFileInfo"></div>
-        <textarea class="form-textarea" id="f-transcript" placeholder="或直接在這裡貼上逐字稿…" style="min-height:140px;margin-top:10px" oninput="updateTranscriptStats()"></textarea>
+        <textarea class="form-textarea" id="f-transcript" placeholder="或直接在這裡貼上逐字稿…" style="min-height:120px;margin-top:10px" oninput="updateTranscriptStats()"></textarea>
         <div id="transcript-stats" style="font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono);text-align:right"></div>
       </div>
 
       <div class="form-group">
-        <button type="button" class="btn-secondary" id="ai-extract-btn" onclick="extractFromTranscript()" style="margin:0">🤖 用 AI 抓重點</button>
+        <button type="button" class="btn-secondary" id="ai-extract-btn" onclick="extractFromTranscript()" style="margin:0">🤖 用 AI 摘要（簡報＋逐字稿）</button>
         <div id="ai-result" style="margin-top:10px;display:none">
           <div class="ai-section">
             <div class="ai-label">📋 摘要 <span style="color:var(--text3);text-transform:none;letter-spacing:0">可手動修改</span></div>
@@ -2349,6 +2555,7 @@ function submitForm(type) {
     rec.keywords = gv('f-keywords');
   } else if (type === 'lecture') {
     rec.speaker = gv('f-speaker');
+    rec.slidesText = gv('f-slides');
     rec.transcript = gv('f-transcript');
     rec.summary = gv('f-summary');
     rec.keypoints = gv('f-keypoints').split('\n').map(s => s.trim()).filter(Boolean);
@@ -2432,11 +2639,13 @@ function editRecord(id) {
       // Lecture-specific
       if (r.type === 'lecture') {
         set('f-speaker', r.speaker);
+        set('f-slides', r.slidesText);
         set('f-transcript', r.transcript);
         set('f-summary', r.summary);
         set('f-keypoints', (r.keypoints || []).join('\n'));
         set('f-actions', (r.actionItems || []).join('\n'));
         updateTranscriptStats();
+        updateSlidesStats();
         // If AI extraction was already done, show the section
         if (r.summary || (r.keypoints && r.keypoints.length) || (r.actionItems && r.actionItems.length)) {
           const aiResult = document.getElementById('ai-result');
@@ -2539,6 +2748,31 @@ function openMenu() {
       </div>
     </div>
 
+    <div class="card" style="${getApiKey() ? '' : 'border-color:var(--amber);background:var(--amber-bg)'}">
+      <div class="section-label" style="margin-bottom:8px">🔑 AI 設定（API 金鑰）</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:8px">
+        ${getApiKey()
+          ? '狀態：<b style="color:var(--green)">已設定</b>，AI 功能可正常使用。'
+          : '狀態：<b style="color:var(--amber)">未設定</b>。在自架網站（如 GitHub Pages）使用時，AI 辨識／摘要需要你自己的 Anthropic API 金鑰。'}
+      </div>
+      <input class="form-input" id="apikey-input" type="password" placeholder="貼上 sk-ant-... 金鑰" value="${esc(getApiKey())}" style="margin-bottom:8px">
+      <div style="display:flex;gap:6px">
+        <button class="btn-primary" style="flex:1;padding:10px" onclick="saveApiKeyFromMenu()">儲存金鑰</button>
+        ${getApiKey() ? `<button class="btn-secondary" style="flex:0 0 auto;margin:0;padding:10px 14px" onclick="clearApiKeyFromMenu()">清除</button>` : ''}
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-top:8px;line-height:1.6">
+        🔒 金鑰只存在你這台裝置的瀏覽器（localStorage），不會上傳、也不會寫進網站檔案。<br>
+        到 <span style="font-family:var(--mono);color:var(--accent)">console.anthropic.com</span> → API Keys 申請。每次呼叫會用到你帳號的額度。
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label" style="margin-bottom:8px">🤖 AI 助理</div>
+      <button class="btn-secondary" style="margin:0 0 8px 0" onclick="openAIReport()">🧠 AI 洞察報告（全庫匯總分析）</button>
+      <button class="btn-secondary" style="margin:0" onclick="openAsk()">💬 問你的人脈庫</button>
+      <div style="font-size:10px;color:var(--text3);margin-top:8px;line-height:1.5">💡 打開任一筆資料的詳情，也能用「AI 分析這筆」取得跟進建議；公司／場合視圖可一鍵 AI 摘要。</div>
+    </div>
+
     <div class="card">
       <div class="section-label" style="margin-bottom:8px">🔭 視圖</div>
       <button class="btn-secondary" style="margin:0 0 8px 0" onclick="openCompanyList()">🏢 公司一覽（${companies}）</button>
@@ -2562,7 +2796,7 @@ function openMenu() {
     </div>
 
     <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:14px;font-family:var(--mono)">
-      v2.1 · 本機儲存 · TF-IDF 相關推薦 · 自動歸檔
+      v2.3 · 本機儲存 · AI 匯總分析 · TF-IDF 相關推薦 · 自動歸檔
     </div>`;
   openModal('menuModal');
 }
@@ -2662,6 +2896,34 @@ async function extractDocxText(file) {
   const buffer = await file.arrayBuffer();
   const result = await window.mammoth.extractRawText({ arrayBuffer: buffer });
   return (result.value || '').trim();
+}
+
+// JSZip (PPTX is a zip of XML) → per-slide text
+async function ensureJSZip() {
+  if (window.JSZip) return;
+  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+}
+function decodeXmlEntities(s) {
+  return s.replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+          .replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+}
+async function extractPptxText(file) {
+  await ensureJSZip();
+  const buffer = await file.arrayBuffer();
+  const zip = await window.JSZip.loadAsync(buffer);
+  const slidePaths = Object.keys(zip.files)
+    .filter(p => /^ppt\/slides\/slide\d+\.xml$/.test(p))
+    .sort((a, b) => (parseInt(a.match(/slide(\d+)\.xml/)[1], 10)) - (parseInt(b.match(/slide(\d+)\.xml/)[1], 10)));
+  const out = [];
+  for (let i = 0; i < slidePaths.length; i++) {
+    const xml = await zip.files[slidePaths[i]].async('string');
+    const runs = [];
+    xml.replace(/<a:t>([\s\S]*?)<\/a:t>/g, (m, t) => { runs.push(decodeXmlEntities(t)); return m; });
+    const slideText = runs.join(' ').replace(/\s+/g, ' ').trim();
+    out.push(`【投影片 ${i + 1}】${slideText}`);
+  }
+  return { text: out.join('\n\n').trim(), slideCount: slidePaths.length };
 }
 
 // pdf.js (PDF → text for lecture transcripts)
@@ -2863,15 +3125,16 @@ async function scanDocx(file, type) {
 function callOcr(type, contentBlocks, preview, textMode) {
   fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: aiHeaders(),
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: AI_MODEL,
       max_tokens: 1500,
       messages: [{ role: 'user', content: contentBlocks }]
     })
   })
   .then(r => r.json())
   .then(data => {
+    if (data && data.error) throw new Error(data.error.message || 'API 錯誤');
     const text = (data.content || []).map(b => b.text || '').join('');
     let parsed = null;
     try {
@@ -2911,7 +3174,7 @@ function callOcr(type, contentBlocks, preview, textMode) {
     const spinner = preview.querySelector('.ocr-result');
     if (spinner) spinner.remove();
     preview.insertAdjacentHTML('beforeend',
-      `<div class="ocr-result" style="color:var(--red)">辨識失敗：${esc(err.message)}<br><small>請手動填寫欄位。</small></div>`);
+      `<div class="ocr-result" style="color:var(--red)">辨識失敗：${esc(aiErrorHint(err))}<br><small>你仍可手動填寫欄位。</small></div>`);
   });
 }
 
@@ -2942,6 +3205,127 @@ function updateTranscriptStats() {
   // rough reading time estimate: Mandarin ~300字/分鐘
   const mins = Math.max(1, Math.round(len / 300));
   stats.textContent = `${len.toLocaleString()} 字 · 約 ${mins} 分鐘閱讀`;
+}
+
+// ── Slide-deck upload (PDF / PPTX) ─────────────────────────────
+function updateSlidesStats() {
+  const ta = document.getElementById('f-slides');
+  const stats = document.getElementById('slides-stats');
+  if (!ta || !stats) return;
+  const txt = ta.value;
+  if (!txt.length) { stats.textContent = ''; return; }
+  const slideCount = (txt.match(/【投影片/g) || []).length;
+  stats.textContent = (slideCount ? `${slideCount} 頁 · ` : '') + `${txt.length.toLocaleString()} 字`;
+}
+
+function handleSlidesUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  const mime = (file.type || '').toLowerCase();
+  const isPdf = mime === 'application/pdf' || ext === 'pdf';
+  const isPptx = ext === 'pptx' || mime.includes('presentationml');
+  const sizeKB = (file.size / 1024).toFixed(1);
+  const info = document.getElementById('slidesFileInfo');
+
+  if (ext === 'ppt') { showToast('舊版 .ppt 暫不支援，請另存為 .pptx 或匯出 PDF'); input.value = ''; return; }
+  if (!isPdf && !isPptx) { showToast('請上傳 PDF 或 PPTX 簡報檔'); input.value = ''; return; }
+  if (file.size > 15 * 1024 * 1024) {
+    if (!confirm(`簡報較大（${sizeKB} KB），解析可能較慢，仍要繼續？`)) { input.value = ''; return; }
+  }
+
+  if (info) {
+    info.innerHTML = `<div class="transcript-file-info" style="background:var(--surface2);color:var(--text2);border-left-color:var(--text3)">
+      <span style="font-size:14px"><span class="spinner" style="border-color:rgba(0,0,0,.15);border-top-color:var(--text)"></span></span>
+      <span class="name">${esc(file.name)}</span>
+      <span class="meta">解析中…</span>
+    </div>`;
+  }
+
+  const finish = (text, label, slideCount) => {
+    const ta = document.getElementById('f-slides');
+    if (ta) {
+      if (ta.value.trim()) {
+        if (!confirm('簡報欄位已有內容，要替換還是附加？\n\n確定 = 替換\n取消 = 附加在後面')) {
+          ta.value = ta.value.trimEnd() + '\n\n' + text;
+        } else {
+          ta.value = text;
+        }
+      } else {
+        ta.value = text;
+      }
+    }
+    if (info) {
+      info.innerHTML = `<div class="transcript-file-info">
+        <span style="font-size:14px">✓</span>
+        <span class="name">${esc(file.name)}</span>
+        <span class="meta">${sizeKB} KB · ${label}${slideCount ? ' · ' + slideCount + ' 頁' : ''}</span>
+      </div>`;
+    }
+    updateSlidesStats();
+    const nameEl = document.getElementById('f-name');
+    if (nameEl && !nameEl.value.trim()) nameEl.value = file.name.replace(/\.[^.]+$/, '');
+    showToast('✓ 簡報已載入，按「AI 摘要」即可整理重點');
+  };
+
+  const onError = (err) => {
+    if (info) {
+      info.innerHTML = `<div class="transcript-file-info" style="background:var(--red-bg);color:var(--red);border-left-color:var(--red)">
+        <span style="font-size:14px">✗</span>
+        <span class="name">${esc(file.name)}</span>
+        <span class="meta">解析失敗</span>
+      </div>`;
+    }
+    showToast('讀取簡報失敗：' + (err?.message || '未知錯誤'));
+  };
+
+  if (isPdf) {
+    extractPdfText(file).then(text => {
+      if (!text) return onError(new Error('PDF 沒有可抓出的文字（可能是純圖片掃描檔）'));
+      finish(text, 'PDF');
+    }).catch(onError).finally(() => { input.value = ''; });
+  } else {
+    extractPptxText(file).then(({ text, slideCount }) => {
+      if (!text) return onError(new Error('PPTX 內沒有抓到文字'));
+      finish(text, 'PPTX', slideCount);
+    }).catch(onError).finally(() => { input.value = ''; });
+  }
+}
+
+// ── Export a single record (e.g. a deck) as Markdown for cloud backup ──
+function exportRecordMarkdown(id) {
+  const r = getById(id);
+  if (!r) return;
+  const lines = [];
+  lines.push('# ' + (r.name || '未命名'));
+  lines.push('');
+  const meta = [];
+  if (r.speaker) meta.push('**講者／主講：** ' + r.speaker);
+  if (r.venue) meta.push('**會議／場合：** ' + r.venue);
+  if (r.company) meta.push('**公司／來源：** ' + r.company);
+  if (r.category) meta.push('**分類：** ' + r.category);
+  meta.push('**重要度：** ' + ((IMP_MAP[r.importance || 1] || {}).label || ''));
+  if (r.tags && r.tags.length) meta.push('**標籤：** ' + r.tags.join('、'));
+  meta.push('**建立時間：** ' + formatDateFull(r.createdAt));
+  lines.push(meta.join('  \n'));
+  lines.push('');
+  if (r.summary) { lines.push('## 摘要', '', r.summary, ''); }
+  if (r.keypoints && r.keypoints.length) { lines.push('## 重點', '', ...r.keypoints.map(k => '- ' + k), ''); }
+  if (r.actionItems && r.actionItems.length) { lines.push('## 行動項目', '', ...r.actionItems.map(k => '- [ ] ' + k), ''); }
+  if (r.keywords) { lines.push('## 關鍵字', '', r.keywords, ''); }
+  if (r.note) { lines.push('## 備注 / 心得', '', r.note, ''); }
+  if (r.slidesText) { lines.push('## 簡報內容（逐頁）', '', r.slidesText, ''); }
+  if (r.transcript) { lines.push('## 逐字稿 / 會議記錄', '', r.transcript, ''); }
+  const md = lines.join('\n');
+  const safeName = (r.name || 'record').replace(/[\\/:*?"<>|]+/g, '_').slice(0, 50);
+  const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${safeName}-${new Date().toISOString().slice(0, 10)}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ 已匯出摘要檔，可存到 Google Drive / 雲端硬碟');
 }
 
 function handleTranscriptUpload(input) {
@@ -3044,19 +3428,26 @@ function handleTranscriptUpload(input) {
 
 function extractFromTranscript() {
   const transcript = (document.getElementById('f-transcript')?.value || '').trim();
-  if (!transcript) { showToast('請先上傳或貼上逐字稿'); return; }
-  if (transcript.length < 30) {
-    if (!confirm('逐字稿很短（少於 30 字），AI 可能抓不到重點。仍要分析？')) return;
+  const slides = (document.getElementById('f-slides')?.value || '').trim();
+  if (!transcript && !slides) { showToast('請先上傳簡報或逐字稿，或直接貼上內容'); return; }
+
+  let source = '';
+  if (slides) source += '【簡報逐頁內容】\n' + slides + '\n\n';
+  if (transcript) source += '【逐字稿 / 會議記錄】\n' + transcript;
+  source = source.trim();
+
+  if (source.length < 30) {
+    if (!confirm('內容很短（少於 30 字），AI 可能抓不到重點。仍要分析？')) return;
   }
 
   const btn = document.getElementById('ai-extract-btn');
   const result = document.getElementById('ai-result');
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> AI 分析中（約 5-15 秒）…';
+    btn.innerHTML = '<span class="spinner"></span> AI 摘要中（約 5-15 秒）…';
   }
 
-  const prompt = `這是一段上課/講座/會議的逐字稿（繁體中文，可能有語音辨識的小錯誤，例如同音字錯誤）。請依下列 JSON 結構回傳分析：
+  const prompt = `以下是一場演講／會議／研討會的資料，可能包含「簡報逐頁內容」與／或「逐字稿」（繁體中文，逐字稿可能有語音辨識的同音字錯誤）。請綜合所有內容，依下列 JSON 結構回傳分析：
 
 {
   "summary": "整體摘要，3-5 句完整段落，繁體中文",
@@ -3067,25 +3458,27 @@ function extractFromTranscript() {
 
 要求：
 - 全部用繁體中文
+- 綜合簡報與逐字稿，若兩者都有請整合成單一份摘要，不要分開條列
 - 如果語音辨識有明顯錯字，在摘要與重點中自然修正
-- 重點請涵蓋講者主要論點，每條 1-2 句話，5-8 條為宜
+- 重點請涵蓋主要論點，每條 1-2 句話，5-8 條為宜
 - 如果沒有明確行動項目，actionItems 可以是空陣列 []
 - 只回傳純 JSON，不要 markdown 標記、不要其他說明
 
-逐字稿：
-${transcript}`;
+內容：
+${source}`;
 
   fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: aiHeaders(),
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: AI_MODEL,
       max_tokens: 2000,
       messages: [{ role: 'user', content: prompt }]
     })
   })
   .then(r => r.json())
   .then(data => {
+    if (data && data.error) throw new Error(data.error.message || 'API 錯誤');
     const text = (data.content || []).map(b => b.text || '').join('');
     let parsed = null;
     try {
@@ -3110,9 +3503,356 @@ ${transcript}`;
     if (btn) { btn.disabled = false; btn.innerHTML = '🤖 重新分析'; }
   })
   .catch(err => {
-    showToast('分析失敗：' + err.message);
-    if (btn) { btn.disabled = false; btn.innerHTML = '🤖 用 AI 抓重點'; }
+    showToast('分析失敗：' + aiErrorHint(err));
+    if (btn) { btn.disabled = false; btn.innerHTML = '🤖 用 AI 摘要（簡報＋逐字稿）'; }
   });
+}
+
+// ══════════════════════════════════════════════════════════════
+// AI SUMMARY & ANALYSIS  (whole-library report, ask-your-data,
+//   per-record insight, group summary)
+// ══════════════════════════════════════════════════════════════
+const AIREPORT_KEY = 'knowledgehub_aireport';
+
+// Shared API call → returns plain text
+async function callClaude(prompt, opts) {
+  opts = opts || {};
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: aiHeaders(),
+    body: JSON.stringify({
+      model: AI_MODEL,
+      max_tokens: opts.maxTokens || 1500,
+      messages: [{ role: 'user', content: prompt }],
+    }),
+  });
+  const data = await res.json();
+  if (data && data.error) throw new Error(data.error.message || 'API 錯誤');
+  return (data.content || []).map(b => b.text || '').join('');
+}
+
+// Tolerant JSON parse (handles ```json fences and surrounding prose)
+function parseJSON(text) {
+  if (!text) return null;
+  const clean = String(text).replace(/```json|```/g, '').trim();
+  try { return JSON.parse(clean); } catch (e) {}
+  const s = clean.indexOf('{'), e = clean.lastIndexOf('}');
+  if (s > -1 && e > s) { try { return JSON.parse(clean.slice(s, e + 1)); } catch (_) {} }
+  return null;
+}
+
+// One-line compact representation of a record (for whole-library prompts)
+function recordSummaryLine(r) {
+  const t = (TYPE_MAP[r.type] || {}).label || r.type;
+  const head = [`[${t}] ${r.name || '(未命名)'}`];
+  if (r.company) head.push(r.company);
+  if (r.title) head.push(r.title);
+  const meta = [];
+  if (r.category) meta.push('分類:' + r.category);
+  if (r.venue) meta.push('場合:' + r.venue);
+  meta.push('重要度:' + ((IMP_MAP[r.importance || 1] || {}).label || ''));
+  if (r.tags && r.tags.length) meta.push('標籤:' + r.tags.join('、'));
+  const fu = followupStatus(r.followupAt);
+  if (fu && (fu.kind === 'overdue' || fu.kind === 'today' || fu.kind === 'soon')) meta.push('待跟進:' + fu.label);
+  let line = head.join(' / ');
+  if (meta.length) line += ' | ' + meta.join(' | ');
+  const extra = r.note || r.summary || r.content || r.keywords || '';
+  if (extra) line += ' | ' + String(extra).replace(/\s+/g, ' ').slice(0, 120);
+  return line;
+}
+
+// Fuller, single-record context (for per-record analysis)
+function recordFullContext(r) {
+  const L = [];
+  L.push('名稱：' + (r.name || ''));
+  if (r.company) L.push('公司：' + r.company);
+  if (r.title) L.push('職稱：' + r.title);
+  if (r.category) L.push('分類：' + r.category);
+  if (r.venue) L.push('認識場合／來源：' + r.venue);
+  if (r.tags && r.tags.length) L.push('標籤：' + r.tags.join('、'));
+  L.push('重要度：' + ((IMP_MAP[r.importance || 1] || {}).label || ''));
+  if (r.keywords) L.push('關鍵字：' + r.keywords);
+  if (r.note) L.push('備注／心得：' + r.note);
+  if (r.content) L.push('內容：' + r.content);
+  if (r.summary) L.push('摘要：' + r.summary);
+  if (r.slidesText) L.push('簡報逐頁內容：' + r.slidesText);
+  if (r.keypoints && r.keypoints.length) L.push('重點：' + r.keypoints.join('；'));
+  const linked = (r.linkedIds || []).map(getById).filter(Boolean);
+  if (linked.length) L.push('已連結的資料：' + linked.map(x => x.name).join('、'));
+  return L.join('\n');
+}
+
+function recordIdByName(name) {
+  const n = (name || '').trim();
+  if (!n) return null;
+  const hit = getAll().find(x => (x.name || '').trim() === n);
+  return hit ? hit.id : null;
+}
+
+// ── 1) Whole-library insight report ────────────────────────────
+function openAIReport() {
+  closeModal('menuModal');
+  document.getElementById('aiReportBody').innerHTML =
+    `<div class="ai-answer"><span class="spinner"></span> 準備中…</div>`;
+  openModal('aiReportModal');
+  let cached = null;
+  try { cached = JSON.parse(localStorage.getItem(AIREPORT_KEY)); } catch (e) {}
+  if (cached && cached.report) {
+    document.getElementById('aiReportBody').innerHTML =
+      aiReportResultHTML(cached.report, cached.meta, cached.at);
+  } else {
+    runAIReport();
+  }
+}
+
+async function runAIReport() {
+  const body = document.getElementById('aiReportBody');
+  if (!body) return;
+  const live = getAll().filter(r => !isArchived(r));
+  if (live.length === 0) {
+    body.innerHTML = `<div class="empty"><div class="empty-icon">🗂️</div><div class="empty-text">還沒有資料可以分析</div></div>`;
+    return;
+  }
+  const ranked = [...live].sort((a, b) =>
+    (b.importance || 1) - (a.importance || 1) ||
+    (new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)));
+  const cap = 150;
+  const sample = ranked.slice(0, cap);
+  const capped = live.length > cap;
+  body.innerHTML = `<div class="ai-answer"><span class="spinner"></span> AI 正在分析 ${sample.length} 筆資料（約 10–20 秒）…</div>`;
+
+  const lines = sample.map(recordSummaryLine).join('\n');
+  const prompt = `你是一位人脈與商業情報顧問。下面是使用者「知識人脈庫」中的資料（每行一筆，包含名片、展場 DM、知識筆記與上課筆記）。請整體分析後，只回傳 JSON（全部繁體中文）：
+
+{
+  "overview": "2-3 句總覽，描述這個資料庫的整體輪廓與重心",
+  "highlights": ["值得注意的觀察，3-5 條"],
+  "priorities": [{"name": "資料名稱（需與下方資料中的名稱完全一致）", "reason": "為什麼建議優先跟進或運用，一句話"}],
+  "gaps": ["資料完整度或經營上的缺口與補強建議，2-4 條"],
+  "themes": [{"theme": "主題／領域", "note": "簡短說明"}],
+  "actions": ["接下來可以採取的具體行動，3-5 條"]
+}
+
+注意：
+- 全部用繁體中文
+- priorities 最多 5 筆，優先從重要度高、或標示待跟進、或久未更新的重要人脈中挑
+- name 必須與資料中的名稱一字不差，方便系統連回該筆資料
+- 只回傳純 JSON，不要 markdown、不要其他說明
+
+資料（資料庫共 ${live.length} 筆${capped ? `，以下為重要度與最近更新排序的前 ${sample.length} 筆` : ''}）：
+${lines}`;
+
+  try {
+    const text = await callClaude(prompt, { maxTokens: 2000 });
+    const rep = parseJSON(text);
+    if (!rep) throw new Error('AI 回傳格式無法解析，請重試');
+    const meta = { total: live.length, analyzed: sample.length, capped };
+    const at = new Date().toISOString();
+    localStorage.setItem(AIREPORT_KEY, JSON.stringify({ at, meta, report: rep }));
+    body.innerHTML = aiReportResultHTML(rep, meta, at);
+  } catch (e) {
+    body.innerHTML = `<div class="ai-answer" style="border-left-color:var(--red);color:var(--red)">分析失敗：${esc(aiErrorHint(e))}</div>
+      <button class="btn-secondary" style="margin-top:10px" onclick="runAIReport()">重試</button>`;
+  }
+}
+
+function aiReportResultHTML(rep, meta, at) {
+  const metaLine = `基於 ${meta.analyzed} 筆資料分析${meta.capped ? `（資料庫共 ${meta.total} 筆，取重要度與最近更新的前 ${meta.analyzed} 筆）` : ''} · ${formatDateFull(at)}`;
+  return `<div class="ai-meta">${esc(metaLine)}</div>` +
+    renderReportHTML(rep) +
+    `<button class="btn-secondary" style="margin-top:14px" onclick="runAIReport()">🔄 重新分析</button>`;
+}
+
+function renderReportHTML(rep) {
+  const sec = (label, inner) => `<div style="margin-top:14px"><div class="section-label">${label}</div>${inner}</div>`;
+  const ul = arr => `<ul class="kp-list">${arr.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
+  let h = '';
+  if (rep.overview) h += `<div class="ai-answer">${esc(rep.overview)}</div>`;
+  if (Array.isArray(rep.highlights) && rep.highlights.length) h += sec('🔍 重點觀察', ul(rep.highlights));
+  if (Array.isArray(rep.priorities) && rep.priorities.length) {
+    h += sec('⭐ 建議優先跟進', rep.priorities.map(p => {
+      const id = recordIdByName(p.name);
+      const click = id ? ` onclick="closeModal('aiReportModal');setTimeout(()=>openDetail('${id}'),250)" style="cursor:pointer"` : '';
+      return `<div class="ai-prio"${click}><div class="ai-prio-name">${esc(p.name || '')}${id ? ' ›' : ''}</div><div class="ai-prio-why">${esc(p.reason || '')}</div></div>`;
+    }).join(''));
+  }
+  if (Array.isArray(rep.themes) && rep.themes.length) {
+    const chips = `<div style="display:flex;flex-wrap:wrap;gap:6px">${rep.themes.map(t => `<span class="tag tag-cat">${esc(t.theme || '')}</span>`).join('')}</div>`;
+    const notes = rep.themes.filter(t => t.note).map(t => `<div>· <b>${esc(t.theme)}</b>：${esc(t.note)}</div>`).join('');
+    h += sec('🧩 主題分布', chips + (notes ? `<div style="font-size:11px;color:var(--text2);margin-top:8px;line-height:1.7">${notes}</div>` : ''));
+  }
+  if (Array.isArray(rep.gaps) && rep.gaps.length) h += sec('⚠️ 缺口與補強', ul(rep.gaps));
+  if (Array.isArray(rep.actions) && rep.actions.length) h += sec('✓ 建議行動', `<ul class="kp-list action-list">${rep.actions.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`);
+  return h || `<div class="ai-answer">（沒有可顯示的分析內容）</div>`;
+}
+
+// ── 2) Ask-your-knowledge-base ─────────────────────────────────
+function openAsk() {
+  closeModal('menuModal');
+  showView({ type: 'ask' });
+  setTimeout(() => { const i = document.getElementById('askInput'); if (i) i.focus(); }, 60);
+}
+
+function renderAsk() {
+  const total = getAll().length;
+  const suggestions = ['我有哪些做包裝／原料的人脈？', '最近認識但還沒跟進的人有誰？', '幫我整理法規相關的資料重點', '哪些人或資料值得優先聯絡運用？'];
+  return `
+  <div class="view-header">
+    <button class="back-btn" onclick="goBack()">← 返回</button>
+    <div style="flex:1;min-width:0">
+      <div class="view-title">🤖 問你的人脈庫</div>
+      <div class="view-subtitle">用問的，AI 從你的 ${total} 筆資料找答案</div>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="search-input" id="askInput" placeholder="例如：我認識哪些做電商的人？" onkeydown="if(event.key==='Enter')runAsk()">
+  </div>
+  <button class="btn-primary" onclick="runAsk()" style="margin-bottom:10px">問 AI</button>
+  <div class="ask-suggest-row">${suggestions.map(s => `<span class="ask-chip" onclick="askSuggestion('${esc(s)}')">${esc(s)}</span>`).join('')}</div>
+  <div id="askResult"></div>`;
+}
+
+function askSuggestion(s) {
+  const inp = document.getElementById('askInput');
+  if (inp) inp.value = s;
+  runAsk();
+}
+
+async function runAsk() {
+  const q = (document.getElementById('askInput')?.value || '').trim();
+  const out = document.getElementById('askResult');
+  if (!out) return;
+  if (!q) { showToast('請先輸入問題'); return; }
+  out.innerHTML = `<div class="ai-answer"><span class="spinner"></span> AI 正在翻你的資料庫…</div>`;
+
+  // Candidate retrieval: relevance search first, then top up with important/recent
+  let cands = searchScored(q).slice(0, 30);
+  const seen = new Set(cands.map(c => c.id));
+  if (cands.length < 12) {
+    const extra = getAll().filter(r => !isArchived(r))
+      .sort((a, b) => (b.importance || 1) - (a.importance || 1) ||
+        (new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)));
+    for (const r of extra) { if (!seen.has(r.id)) { cands.push(r); seen.add(r.id); } if (cands.length >= 40) break; }
+  }
+  if (cands.length === 0) {
+    out.innerHTML = `<div class="empty"><div class="empty-icon">🗂️</div><div class="empty-text">資料庫裡還沒有資料</div></div>`;
+    return;
+  }
+
+  const lines = cands.map((r, i) => `${i + 1}. ${recordSummaryLine(r)}`).join('\n');
+  const prompt = `你是使用者「知識人脈庫」的智慧助理。請「只根據」下方提供的資料回答問題，用繁體中文，語氣口語、精簡、實用。
+- 如果資料中找得到答案，請直接整理重點，並點名相關的人或資料名稱。
+- 如果資料裡沒有相關內容，就誠實說「目前庫裡沒有相關資料」，絕對不要編造不存在的人或內容。
+- 不要用 markdown 標題，直接寫成好讀的段落或條列。
+
+問題：${q}
+
+可參考的資料（每行一筆）：
+${lines}`;
+
+  try {
+    const text = await callClaude(prompt, { maxTokens: 1200 });
+    let h = `<div class="ai-answer">${esc((text || '').trim())}</div>`;
+    const refs = cands.slice(0, 12);
+    h += `<div class="section-label" style="margin-top:16px">📎 參考的資料（${refs.length} 筆）</div>`;
+    h += refs.map(r => renderCard(r, { compact: true })).join('');
+    out.innerHTML = h;
+  } catch (e) {
+    out.innerHTML = `<div class="ai-answer" style="border-left-color:var(--red);color:var(--red)">回答失敗：${esc(aiErrorHint(e))}</div>`;
+  }
+}
+
+// ── 3) Per-record AI insight ───────────────────────────────────
+function renderRecordInsight(r) {
+  const ins = r.aiInsight;
+  if (!ins) return '';
+  let h = '';
+  if (ins.summary) h += `<div class="ai-answer" style="margin-bottom:8px">${esc(ins.summary)}</div>`;
+  const block = (label, arr, action) => (Array.isArray(arr) && arr.length)
+    ? `<div style="margin-top:8px"><div class="section-label">${label}</div><ul class="kp-list ${action ? 'action-list' : ''}">${arr.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : '';
+  h += block('💬 聊天／破冰切入點', ins.talking_points);
+  h += block('🤝 合作或運用機會', ins.opportunities);
+  h += block('💡 關鍵要點', ins.takeaways);
+  h += block('✓ 建議行動', ins.actions, true);
+  if (ins.next_step) h += `<div style="margin-top:8px"><div class="section-label">➡️ 建議的下一步</div><div class="ai-answer">${esc(ins.next_step)}</div></div>`;
+  if (r.aiInsightAt) h += `<div class="ai-meta" style="margin-top:8px">分析於 ${formatDateFull(r.aiInsightAt)}</div>`;
+  return h;
+}
+
+async function runRecordAnalysis(id) {
+  const r = getById(id);
+  if (!r) return;
+  const btn = document.getElementById('recordAiBtn');
+  const body = document.getElementById('recordAiBody');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> AI 分析中…'; }
+  if (body && !r.aiInsight) body.innerHTML = `<div class="ai-answer"><span class="spinner"></span> AI 分析中（約 5–10 秒）…</div>`;
+
+  const ctx = recordFullContext(r);
+  let prompt;
+  if (r.type === 'contact') {
+    prompt = `你是一位人脈經營顧問。根據下面這位聯絡人的資料，給我實用、具體的建議。只回傳 JSON（全部繁體中文）：
+
+{
+  "summary": "1-2 句點出這個人的價值定位或值得注意之處",
+  "talking_points": ["下次聯絡時可以聊的切入點或破冰話題，2-4 條"],
+  "opportunities": ["可能的合作、求助或運用方式，2-3 條"],
+  "next_step": "建議的下一步行動，一句話"
+}
+
+只回傳純 JSON，不要 markdown 或其他說明。
+
+聯絡人資料：
+${ctx}`;
+  } else {
+    prompt = `你是知識整理助理。根據下面這筆資料，幫使用者萃取重點。只回傳 JSON（全部繁體中文）：
+
+{
+  "summary": "重點摘要 2-3 句",
+  "takeaways": ["關鍵要點 3-5 條"],
+  "actions": ["可採取的後續行動 1-3 條，如果沒有就回傳空陣列 []"]
+}
+
+只回傳純 JSON，不要 markdown 或其他說明。
+
+資料：
+${ctx}`;
+  }
+
+  try {
+    const text = await callClaude(prompt, { maxTokens: 1200 });
+    const parsed = parseJSON(text);
+    if (!parsed) throw new Error('AI 回傳格式無法解析，請重試');
+    updateRecord(id, { aiInsight: parsed, aiInsightAt: new Date().toISOString() });
+    showToast('✓ AI 分析完成');
+    openDetail(id); // rebuild detail to show stored insight
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.innerHTML = r.type === 'contact' ? '🤖 AI 分析這個人' : '🤖 AI 分析這筆'; }
+    if (body && !r.aiInsight) body.innerHTML = '';
+    showToast('分析失敗：' + aiErrorHint(e));
+  }
+}
+
+// ── 4) Group (company / venue) AI summary ──────────────────────
+async function runGroupSummary(kind, value) {
+  const field = kind === 'company' ? 'company' : 'venue';
+  const label = kind === 'company' ? '公司' : '場合';
+  const recs = getAll().filter(r => (r[field] || '').trim() === value && !isArchived(r));
+  const body = document.getElementById('groupAiBody');
+  if (!body) return;
+  if (!recs.length) { body.innerHTML = `<div class="ai-answer">這個${label}沒有可摘要的資料</div>`; return; }
+  body.innerHTML = `<div class="ai-answer"><span class="spinner"></span> AI 摘要中…</div>`;
+  const lines = recs.map(recordSummaryLine).join('\n');
+  const prompt = `以下是使用者在「${label}：${value}」收集到的 ${recs.length} 筆資料。請用繁體中文寫一段 3-5 句的摘要，點出這個${label}的重點、彼此的共通點，以及可以延伸的行動或機會。直接回傳純文字，不要 JSON、不要 markdown 標題。
+
+資料：
+${lines}`;
+  try {
+    const text = await callClaude(prompt, { maxTokens: 800 });
+    body.innerHTML = `<div class="ai-answer">${esc((text || '').trim())}</div>`;
+  } catch (e) {
+    body.innerHTML = `<div class="ai-answer" style="border-left-color:var(--red);color:var(--red)">摘要失敗：${esc(aiErrorHint(e))}</div>`;
+  }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -3121,7 +3861,11 @@ ${transcript}`;
 function openModal(id) {
   const el = document.getElementById(id);
   el.classList.add('open');
-  el.onclick = e => { if (e.target === el) closeModal(id); };
+  el.onclick = e => {
+    if (e.target !== el) return;
+    if (id === 'addModal') requestCloseAdd();
+    else closeModal(id);
+  };
 }
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
@@ -3130,6 +3874,23 @@ function closeModal(id) {
     _ocrText = '';
     _currentTags = [];
   }
+}
+
+// Guard against losing a half-filled add/edit form by accident
+function isAddFormDirty() {
+  if (!document.getElementById('f-name')) return false; // type chooser, nothing to lose
+  const ids = ['f-name','f-company','f-title','f-phone','f-email','f-line',
+               'f-keywords','f-content','f-venue','f-note','f-speaker','f-transcript','f-slides','f-summary'];
+  const anyField = ids.some(fid => { const el = document.getElementById(fid); return el && el.value.trim(); });
+  const tagInput = document.getElementById('tag-input');
+  const pendingTag = tagInput && tagInput.value.trim();
+  return anyField || pendingTag || (_currentTags && _currentTags.length > 0);
+}
+function requestCloseAdd() {
+  if (isAddFormDirty()) {
+    if (!confirm('這筆資料還沒儲存，確定要關閉並放棄嗎？')) return;
+  }
+  closeModal('addModal');
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -3144,6 +3905,62 @@ function formatDateFull(iso) {
   if (!iso) return '';
   const d = new Date(iso);
   return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+// Human-friendly relative time for cards: 今天 / 昨天 / N天前 / 月/日（跨年才顯示年份）
+function relTime(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const now = new Date();
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startThat = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const diff = Math.round((startToday - startThat) / 86400000);
+  if (diff === 0) return '今天';
+  if (diff === 1) return '昨天';
+  if (diff >= 2 && diff <= 6) return `${diff} 天前`;
+  if (diff < 0 && diff >= -6) return `${-diff} 天後`;
+  return d.getFullYear() === now.getFullYear()
+    ? `${d.getMonth()+1}/${d.getDate()}`
+    : `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
+}
+
+// Copy to clipboard with friendly feedback (with fallback for older browsers)
+function copyText(text, label) {
+  if (!text) return;
+  const done = () => showToast('✓ 已複製' + (label ? '：' + label : ''));
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, done) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed'; ta.style.top = '-9999px'; ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); done(); } catch (e) { showToast('複製失敗，請手動選取'); }
+  document.body.removeChild(ta);
+}
+
+// Follow-up quick actions
+function completeFollowup(id) {
+  updateRecord(id, { followupAt: null });
+  showToast('✓ 已完成跟進');
+  const dm = document.getElementById('detailModal');
+  if (dm && dm.classList.contains('open')) openDetail(id);
+  else render();
+}
+function rescheduleFollowup(id, days) {
+  const d = new Date();
+  d.setHours(9, 0, 0, 0);
+  d.setDate(d.getDate() + days);
+  updateRecord(id, { followupAt: d.toISOString() });
+  showToast(`✓ 已設定 ${days} 天後提醒`);
+  const dm = document.getElementById('detailModal');
+  if (dm && dm.classList.contains('open')) openDetail(id);
+  else render();
 }
 
 function showToast(msg) {
