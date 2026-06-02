@@ -335,6 +335,19 @@ input[type=file] { display: none; }
 }
 .ocr-label { font-size: 12px; color: var(--accent); margin-bottom: 4px; font-family: var(--mono); letter-spacing:.05em; }
 
+/* Photo rotate / re-recognise toolbar */
+.scan-toolbar { display: flex; gap: 6px; margin-bottom: 2px; }
+.scan-tool-btn {
+  flex: 1; padding: 10px 8px; border-radius: var(--radius-sm);
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text); font-size: 14px; font-family: var(--font);
+  cursor: pointer; transition: border-color .15s, background .15s, transform .1s;
+}
+.scan-tool-btn:hover { border-color: var(--accent); color: var(--accent); }
+.scan-tool-btn:active { transform: scale(.97); }
+.scan-tool-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); flex: 1.4; font-weight: 500; }
+.scan-tool-btn.primary:hover { color: #fff; opacity: .92; }
+
 /* ── Buttons ── */
 .btn-primary {
   width: 100%; padding: 14px; border-radius: var(--radius-sm);
@@ -3020,7 +3033,7 @@ function fixOrientation(file) {
         }
         ctx.drawImage(img, 0, 0);
         URL.revokeObjectURL(url);
-        resolve(canvas.toDataURL('image/jpeg', 0.85));
+        resolve(canvas.toDataURL('image/jpeg', 0.92));
       };
       img.src = url;
     };
@@ -3033,12 +3046,16 @@ function fixOrientation(file) {
 // ══════════════════════════════════════════════════════════════
 
 const OCR_PROMPTS = {
-  contact: `你是名片辨識工具。照片可能傾斜、上下顛倒或左右鏡像，請自行轉正判讀。請辨識名片內容並「只輸出」JSON（找不到的欄位給空字串 ""）：
+  contact: `你是台灣名片辨識工具。照片可能傾斜、上下顛倒或左右鏡像，請自行轉正判讀。請辨識名片內容並「只輸出」JSON（找不到的欄位給空字串 ""）：
 {"name":"姓名（人名，若名片只有公司沒有人名則留空）","company":"公司名稱","title":"職稱","phone":"主要電話","email":"Email","note":"其他資訊：傳真、手機、地址、營業時間等"}
+重要規則：
+- 逐字照抄名片上實際印出的繁體中文與數字，看不清楚的欄位請留空，務必不要猜測或編造姓名與公司名。
+- 電話、傳真、手機請保留完整數字與區碼（例如 06-2220191）。
+- 若整體很模糊或顛倒到無法判讀，把能確定的留著、其餘留空，不要硬猜。
 直接輸出 JSON 物件，第一個字元必須是 {，不要任何前言、說明或 markdown。`,
   dm: `你是文件辨識工具。照片可能傾斜或顛倒，請自行轉正判讀。請辨識下列 DM／型錄／文件並摘要，「只輸出」JSON：
 {"name":"文件/DM名稱","company":"公司名稱","keywords":"3~6個關鍵字用逗號分隔","note":"內容摘要（繁體中文，2~4句）"}
-直接輸出 JSON 物件，第一個字元必須是 {，不要任何前言、說明或 markdown。`,
+逐字照抄實際印出的文字，不要編造；直接輸出 JSON 物件，第一個字元必須是 {，不要任何前言、說明或 markdown。`,
 };
 
 function handleScan(input, type) {
@@ -3073,19 +3090,75 @@ function renderFileBanner(file, label) {
   </div>`;
 }
 
+// ── Image scan with manual rotate + re-recognise ──────────────
+let _scan = { dataUrl: '', type: '', running: false };
+
 function scanImage(file, type) {
   const preview = document.getElementById('ocrPreview');
-  preview.innerHTML = `<div class="ocr-result"><span class="spinner"></span> 修正方向中…</div>`;
+  preview.innerHTML = `<div class="ocr-result"><span class="spinner"></span> 處理照片中…</div>`;
   fixOrientation(file).then(dataUrl => {
-    preview.innerHTML = `
-      <img src="${dataUrl}" style="width:100%;border-radius:8px;margin-bottom:8px;max-height:220px;object-fit:contain;background:#000">
-      <div class="ocr-result"><span class="spinner"></span> AI 辨識中…</div>`;
-    const base64 = dataUrl.split(',')[1];
-    callOcr(type, [
-      { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64 } },
-      { type: 'text', text: OCR_PROMPTS[type] }
-    ], preview);
+    _scan = { dataUrl, type, running: false };
+    renderScanPreview();
+    runScanOcr(); // auto-attempt once; user can rotate + retry if wrong
   });
+}
+
+function renderScanPreview(statusHtml) {
+  const preview = document.getElementById('ocrPreview');
+  if (!preview || !_scan.dataUrl) return;
+  preview.innerHTML = `
+    <img src="${_scan.dataUrl}" style="width:100%;border-radius:8px;margin-bottom:6px;max-height:240px;object-fit:contain;background:#000">
+    <div class="scan-toolbar">
+      <button type="button" class="scan-tool-btn" onclick="rotateScan(-90)">↺ 左轉</button>
+      <button type="button" class="scan-tool-btn" onclick="rotateScan(90)">↻ 右轉</button>
+      <button type="button" class="scan-tool-btn primary" onclick="runScanOcr()">🔍 重新辨識</button>
+    </div>
+    <div style="font-size:12px;color:var(--text2);margin:2px 0 0;line-height:1.5">📌 名片若是斜的或顛倒，先轉正再按「重新辨識」會準很多。</div>
+    <div id="ocrStatus">${statusHtml || ''}</div>`;
+}
+
+function rotateDataUrl(dataUrl, deg) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      const ctx = c.getContext('2d');
+      if (Math.abs(deg) % 180 === 90) { c.width = img.height; c.height = img.width; }
+      else { c.width = img.width; c.height = img.height; }
+      ctx.translate(c.width / 2, c.height / 2);
+      ctx.rotate(deg * Math.PI / 180);
+      ctx.drawImage(img, -img.width / 2, -img.height / 2);
+      resolve(c.toDataURL('image/jpeg', 0.92));
+    };
+    img.src = dataUrl;
+  });
+}
+
+async function rotateScan(deg) {
+  if (!_scan.dataUrl) return;
+  _scan.dataUrl = await rotateDataUrl(_scan.dataUrl, deg);
+  renderScanPreview();
+}
+
+function clearScanFields(type) {
+  const ids = (type === 'contact')
+    ? ['f-name', 'f-company', 'f-title', 'f-phone', 'f-email', 'f-note']
+    : ['f-name', 'f-company', 'f-keywords', 'f-note'];
+  ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+}
+
+function runScanOcr() {
+  if (!_scan.dataUrl || _scan.running) return;
+  _scan.running = true;
+  const status = document.getElementById('ocrStatus');
+  if (status) status.innerHTML = `<div class="ocr-result"><span class="spinner"></span> AI 辨識中…</div>`;
+  clearScanFields(_scan.type); // avoid leaving stale/wrong values from a previous attempt
+  const base64 = _scan.dataUrl.split(',')[1];
+  const target = document.getElementById('ocrStatus') || document.getElementById('ocrPreview');
+  callOcr(_scan.type, [
+    { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64 } },
+    { type: 'text', text: OCR_PROMPTS[_scan.type] }
+  ], target).finally(() => { _scan.running = false; });
 }
 
 function scanPdf(file, type) {
@@ -3123,7 +3196,7 @@ async function scanDocx(file, type) {
 
 // Shared: send to Claude API and fill form
 function callOcr(type, contentBlocks, preview, textMode) {
-  fetch('https://api.anthropic.com/v1/messages', {
+  return fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: aiHeaders(),
     body: JSON.stringify({
